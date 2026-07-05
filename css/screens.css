@@ -1,0 +1,302 @@
+/* ============================================================
+   В ТЕМУ! — screens.css
+   Menu screen + game screen layouts, tiles, solved banners.
+   ============================================================ */
+
+/* ============================================================
+   MENU
+   ============================================================ */
+
+.menu-logo-zone {
+  position: relative;
+  margin-top: 26px;
+  width: 620px; height: 190px;
+  display: flex; align-items: center; justify-content: center;
+  flex: 0 0 auto;
+}
+
+#menu-logo {
+  width: 540px;
+  animation: logo-bob 3.4s ease-in-out infinite;
+  filter: drop-shadow(0 10px 0 rgba(0,0,0,.4));
+  z-index: 2;
+}
+@keyframes logo-bob {
+  0%, 100% { transform: translateY(0) rotate(-.6deg); }
+  50%      { transform: translateY(-10px) rotate(.6deg); }
+}
+
+/* deterministic CSS twinkles around the logo (canvas adds random ones) */
+.deco-layer { position: absolute; inset: -30px; pointer-events: none; z-index: 1; }
+.deco-layer .tw {
+  position: absolute;
+  animation: twinkle var(--tw-dur, 2.2s) ease-in-out infinite;
+  animation-delay: var(--tw-delay, 0s);
+}
+@keyframes twinkle {
+  0%, 100% { transform: scale(.4); opacity: .25; }
+  50%      { transform: scale(1.15) rotate(4deg); opacity: 1; }
+}
+
+.tagline-row { margin-top: 8px; flex: 0 0 auto; }
+.tagline {
+  font-size: 14px; letter-spacing: 1px; color: var(--green-text);
+  text-shadow: 0 0 14px rgba(157,193,87,.4), 2px 2px 0 rgba(0,0,0,.7);
+  animation: tagline-glow 2.6s ease-in-out infinite;
+}
+@keyframes tagline-glow {
+  0%,100% { text-shadow: 0 0 8px rgba(157,193,87,.25), 2px 2px 0 rgba(0,0,0,.7); }
+  50%     { text-shadow: 0 0 18px rgba(157,193,87,.6), 2px 2px 0 rgba(0,0,0,.7); }
+}
+.chev { animation: chev-pulse 1.2s steps(2) infinite; }
+@keyframes chev-pulse { 50% { opacity: .45; } }
+
+.menu-buttons {
+  margin-top: 26px;
+  display: flex; flex-direction: column; gap: 16px;
+  flex: 0 0 auto;
+  z-index: 3;
+}
+
+/* floating side decorations */
+.side-deco { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.side-deco .sd {
+  position: absolute;
+  animation: sd-float var(--sd-dur, 4s) ease-in-out infinite;
+  animation-delay: var(--sd-delay, 0s);
+  filter: drop-shadow(4px 6px 0 rgba(0,0,0,.35));
+}
+@keyframes sd-float {
+  0%,100% { transform: translateY(0) rotate(-2deg); }
+  50%     { transform: translateY(-12px) rotate(2deg); }
+}
+.side-deco .dots {
+  position: absolute; width: 110px; height: 64px; opacity: .5;
+  background-image: radial-gradient(#3d472a 2px, transparent 2.5px);
+  background-size: 18px 18px;
+}
+
+/* ============================================================
+   GAME
+   ============================================================ */
+
+.game-header {
+  width: 100%;
+  display: flex; align-items: center; justify-content: space-between;
+  flex: 0 0 auto;
+}
+.game-logo {
+  height: 52px;
+  animation: logo-bob 3.4s ease-in-out infinite;
+  filter: drop-shadow(0 4px 0 rgba(0,0,0,.4));
+}
+
+.game-hint {
+  margin: 12px 0 4px;
+  font-size: 11px; letter-spacing: 1px; color: var(--dim);
+  animation: hint-fade .4s ease both;
+}
+.game-hint.lit { color: var(--green-text); text-shadow: 0 0 12px rgba(157,193,87,.5); }
+@keyframes hint-fade { from { opacity: 0; } }
+
+/* middle block: solved stack + board + controls, vertically centered */
+.game-mid {
+  flex: 1 1 auto;
+  width: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px;
+  min-height: 0;
+  padding-bottom: 14px;
+}
+
+/* solved group banners */
+#solved-stack {
+  width: 100%; max-width: 760px;
+  display: flex; flex-direction: column; gap: 10px;
+  flex: 0 0 auto;
+  margin-top: 8px;
+}
+#solved-stack:not(:empty) { margin-bottom: 10px; }
+
+.solved-banner {
+  --gc: var(--green);
+  position: relative;
+  min-height: 64px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  padding: 9px 16px;
+  border: 3px solid var(--ink); border-radius: 8px;
+  background:
+    linear-gradient(rgba(255,255,255,.22), rgba(255,255,255,0) 45%, rgba(0,0,0,.14)),
+    var(--gc);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.35), 0 4px 0 var(--ink);
+  color: var(--ink);
+  animation: banner-pop .34s cubic-bezier(.34,1.56,.64,1) both;
+  overflow: hidden;
+}
+@keyframes banner-pop {
+  0%  { transform: scale(.6); opacity: 0; }
+  70% { transform: scale(1.04); }
+  100%{ transform: scale(1); opacity: 1; }
+}
+.solved-banner .sg-title { font-size: 14px; letter-spacing: 1px; text-shadow: 0 1px 0 rgba(255,255,255,.35); }
+.solved-banner .sg-words { font-size: 10px; opacity: .82; letter-spacing: 1px; }
+.solved-banner::after { /* shine sweep */
+  content: ''; position: absolute; top: 0; bottom: 0; width: 60px;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.5), transparent);
+  animation: banner-shine 1s ease .15s both;
+}
+@keyframes banner-shine { from { left: -80px; } to { left: 110%; } }
+
+/* the board */
+#board-wrap { position: relative; flex: 0 0 auto; margin-top: 6px; }
+
+#grid {
+  display: grid;
+  grid-template-columns: repeat(4, 178px);
+  gap: 14px;
+  transition: opacity .2s;
+}
+
+#wires {
+  position: absolute; inset: -20px;
+  width: calc(100% + 40px); height: calc(100% + 40px);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ---- word tile ---- */
+.tile {
+  position: relative;
+  height: 76px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 6px 8px;
+  font-family: var(--px-font); font-size: 15px; letter-spacing: 0;
+  color: var(--ink);
+  background: linear-gradient(#ddd0a2, var(--khaki) 55%, #c4b483);
+  border: 3px solid var(--ink); border-radius: 8px;
+  box-shadow:
+    inset 0 3px 0 rgba(255,255,255,.5),
+    inset 0 -4px 0 rgba(90,75,40,.45),
+    0 4px 0 var(--ink);
+  cursor: pointer;
+  transition: transform .1s ease, box-shadow .1s ease, background .12s, color .12s;
+  z-index: 2;
+}
+.tile span { pointer-events: none; transform: translateY(1px); white-space: nowrap; }
+
+.tile:hover {
+  background: linear-gradient(#eee2b4, #e0d3a0 55%, #cfbf8d);
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 3px 0 rgba(255,255,255,.55),
+    inset 0 -4px 0 rgba(90,75,40,.45),
+    0 6px 0 var(--ink), 0 8px 16px rgba(0,0,0,.4);
+}
+.tile:active { transform: translateY(2px) scale(.98); box-shadow: inset 0 2px 0 rgba(255,255,255,.4), 0 1px 0 var(--ink); }
+
+.tile.sel {
+  background: linear-gradient(#cbe98d, var(--green) 55%, #7da13e);
+  color: #15200a;
+  transform: translateY(-3px) scale(1.03);
+  box-shadow:
+    inset 0 3px 0 rgba(255,255,255,.5),
+    inset 0 -4px 0 rgba(50,70,20,.55),
+    0 6px 0 var(--ink),
+    0 0 22px rgba(150,210,80,.45);
+  animation: tile-select .18s cubic-bezier(.34,1.56,.64,1);
+  z-index: 3;
+}
+@keyframes tile-select {
+  0% { transform: translateY(-1px) scale(.94); }
+  60% { transform: translateY(-4px) scale(1.07); }
+  100% { transform: translateY(-3px) scale(1.03); }
+}
+.tile.sel:hover { filter: brightness(1.07); }
+
+/* chain-order badge on selected tiles */
+.tile.sel::after {
+  content: attr(data-order);
+  position: absolute; top: -12px; right: -10px;
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: #15200a;
+  background: var(--green-bright);
+  border: 3px solid var(--ink); border-radius: 6px;
+  box-shadow: 0 2px 0 var(--ink), 0 0 12px rgba(160,220,90,.5);
+  animation: badge-pop .22s cubic-bezier(.34,1.8,.64,1) both;
+}
+@keyframes badge-pop { from { transform: scale(0) rotate(-40deg); } }
+
+/* dealing animation */
+.tile.deal { animation: tile-deal .38s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes tile-deal {
+  0% { transform: translateY(26px) scale(.55); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* wrong guess shake */
+.tile.shake { animation: tile-shake .45s steps(12) both; }
+@keyframes tile-shake {
+  0%,100% { transform: translateX(0); }
+  15% { transform: translateX(-7px) rotate(-1.5deg); }
+  30% { transform: translateX(7px) rotate(1.5deg); }
+  45% { transform: translateX(-6px); }
+  60% { transform: translateX(6px); }
+  75% { transform: translateX(-3px); }
+  90% { transform: translateX(3px); }
+}
+
+/* correct — celebratory pop before flying into banner */
+.tile.won {
+  background: linear-gradient(var(--gold-bright), var(--gold) 55%, #c08d2a);
+  animation: tile-won .5s ease both;
+  z-index: 4;
+}
+@keyframes tile-won {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.14) rotate(-2deg); filter: brightness(1.5); }
+  60%  { transform: scale(1.06) rotate(2deg); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+
+/* FLIP transitions (shuffle / collapse) get inline transforms; this
+   class enables their smooth playback */
+.tile.fliping { transition: transform .42s cubic-bezier(.25,.9,.3,1.15); }
+
+/* ---- controls under the grid ---- */
+.game-controls {
+  width: 100%; max-width: 760px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 22px;
+  flex: 0 0 auto;
+}
+.hearts { display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--dim); }
+#hearts-row { display: inline-flex; gap: 7px; }
+#hearts-row .hp { display: inline-flex; transition: transform .2s; }
+#hearts-row .hp.lost { animation: heart-break .7s ease both; }
+@keyframes heart-break {
+  0%  { transform: scale(1); filter: none; }
+  25% { transform: scale(1.35); filter: brightness(2); }
+  55% { transform: scale(.9) rotate(14deg) translateY(4px); filter: saturate(.4); }
+  100%{ transform: scale(.85) rotate(22deg) translateY(10px); filter: saturate(0) brightness(.55); opacity: .5; }
+}
+.ctrl-btns { display: flex; gap: 12px; }
+
+/* board shake on wrong answer */
+#board-wrap.board-shake { animation: board-shake .4s steps(8) both; }
+@keyframes board-shake {
+  0%,100% { transform: translate(0,0); }
+  20% { transform: translate(-6px, 2px); }
+  40% { transform: translate(5px, -2px); }
+  60% { transform: translate(-4px, 1px); }
+  80% { transform: translate(3px, -1px); }
+}
+
+/* ---- win/lose modal extras ---- */
+.result-stats {
+  display: flex; gap: 26px; justify-content: center;
+  font-size: 12px; color: var(--cream-dark);
+}
+.result-stats .rs { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.result-stats .rs b { font-size: 20px; color: var(--gold); font-weight: 400; text-shadow: 2px 2px 0 rgba(0,0,0,.5); }
+.reveal-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
