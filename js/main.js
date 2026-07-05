@@ -1,7 +1,7 @@
 /* ============================================================
    В ТЕМУ! — main.js
-   Boot: monitor scaling, pixel cursors, TV noise texture,
-   settings persistence, power-on sequence, screen registry.
+   Boot: pixel cursors, TV noise texture, settings persistence,
+   power-on sequence, screen registry.
    ============================================================ */
 (function () {
   'use strict';
@@ -27,19 +27,6 @@
     },
   };
 
-  /* ---------------- monitor scaling ---------------- */
-
-  function fitMonitor() {
-    const mon = document.getElementById('monitor');
-    const w = mon.offsetWidth || 1000;
-    const h = mon.offsetHeight || 970;
-    const k = Math.min(
-      (window.innerWidth * 0.96) / w,
-      (window.innerHeight * 0.96) / h
-    );
-    document.documentElement.style.setProperty('--mon-scale', Math.min(k, 1.15).toFixed(4));
-  }
-
   /* ---------------- pixel cursors ---------------- */
 
   function installCursors() {
@@ -48,7 +35,7 @@
     const style = document.createElement('style');
     style.textContent = `
       body { cursor: url(${arrow}) 2 2, auto; }
-      button, .ptoggle, .tile, .mbtn, .cbtn, #menu-logo, #power-btn {
+      button, .ptoggle, .tile, .mbtn, .cbtn, #menu-logo {
         cursor: url(${hand}) 12 4, pointer;
       }
     `;
@@ -68,9 +55,6 @@
 
     VT.menuScreen.init();
     VT.gameScreen.init();
-
-    fitMonitor();
-    window.addEventListener('resize', fitMonitor);
 
     /* audio requires a user gesture — unlock on first input */
     const unlock = () => { VT.audio.unlock(); document.removeEventListener('pointerdown', unlock); };

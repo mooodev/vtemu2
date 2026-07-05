@@ -1,15 +1,61 @@
 /* ============================================================
    В ТЕМУ! — ui/menu.js
-   Main menu: hovering logo with sparkle/heart emitters,
-   floating side props, vibrant buttons, settings modal,
-   placeholder modals, CRT power-off easter egg.
+   Main menu: live text logo with sparkle/heart emitters,
+   floating PNG pixel props (reshuffled every visit), vibrant
+   buttons, settings modal, placeholder modals, CRT power-off
+   easter egg (tap the dead screen to power back on).
    ============================================================ */
 (function () {
   'use strict';
   const VT = window.VT;
-  const { el, screenPos, rand } = VT.util;
+  const { el, screenPos, rand, shuffle } = VT.util;
 
   let emitters = [];
+  let menuLogo = null;
+
+  /* PNG pixel-art props (sprites/ folder). The mug keeps its id so
+     the steam emitter can find it wherever it lands. */
+  const PROPS = [
+    { src: 'sprites/cup.png',             w: 92,  id: 'deco-mug' },
+    { src: 'sprites/lightbulb.png',       w: 88 },
+    { src: 'sprites/magnifyingglass.png', w: 94 },
+    { src: 'sprites/books.png',           w: 104 },
+    { src: 'sprites/speechbubble.png',    w: 78 },
+  ];
+  /* anchor points (percent, element centered on them) */
+  const SLOTS = [
+    { x: 10, y: 36 },
+    { x: 8,  y: 63 },
+    { x: 90, y: 38 },
+    { x: 88, y: 64 },
+    { x: 82, y: 12 },
+  ];
+
+  /** Drop the props into randomly assigned slots — new layout
+      every time the menu is entered. */
+  function placeProps() {
+    const side = document.getElementById('side-deco');
+    side.querySelectorAll('.sd').forEach((s) => s.remove());
+    const slots = shuffle(SLOTS);
+    PROPS.forEach((p, i) => {
+      const s = slots[i];
+      const d = el('span', 'sd');
+      if (p.id) d.id = p.id;
+      d.style.left = (s.x + rand(-2, 2)).toFixed(1) + '%';
+      d.style.top = (s.y + rand(-2, 2)).toFixed(1) + '%';
+      const bob = el('span', 'sd-bob');
+      bob.style.setProperty('--sd-dur', rand(3.4, 5.2).toFixed(2) + 's');
+      bob.style.setProperty('--sd-delay', (-rand(0, 4)).toFixed(2) + 's');
+      const img = el('img');
+      img.src = p.src;
+      img.alt = '';
+      img.draggable = false;
+      img.style.width = `clamp(44px, 11vw, ${p.w}px)`;
+      bob.appendChild(img);
+      d.appendChild(bob);
+      side.appendChild(d);
+    });
+  }
 
   function decorate() {
     /* deterministic twinkles pinned around the logo */
@@ -43,24 +89,8 @@
       c.appendChild(img);
     });
 
-    /* floating side props */
+    /* dotted texture patches in the corners */
     const side = document.getElementById('side-deco');
-    side.innerHTML = '';
-    const props = [
-      { s: 'magnifier', sc: 5, x: '7%',  y: '38%', dur: 4.2 },
-      { s: 'books',     sc: 5, x: '5%',  y: '64%', dur: 5.1 },
-      { s: 'bulb',      sc: 5, x: '86%', y: '40%', dur: 3.6 },
-      { s: 'mug',       sc: 5, x: '85%', y: '66%', dur: 4.8, id: 'deco-mug' },
-    ];
-    props.forEach((p, i) => {
-      const d = el('span', 'sd');
-      if (p.id) d.id = p.id;
-      d.style.left = p.x; d.style.top = p.y;
-      d.style.setProperty('--sd-dur', p.dur + 's');
-      d.style.setProperty('--sd-delay', i * -1.3 + 's');
-      d.appendChild(VT.sprites.img(p.s, { scale: p.sc }));
-      side.appendChild(d);
-    });
     [['12%', '20%'], ['74%', '22%'], ['10%', '84%'], ['78%', '84%']].forEach(([x, y]) => {
       const dots = el('span', 'dots');
       dots.style.left = x; dots.style.top = y;
@@ -70,7 +100,6 @@
 
   function startAmbient() {
     const logo = document.getElementById('menu-logo');
-    const mug = document.getElementById('deco-mug');
     emitters = [
       VT.fx.zoneSparkler(() => {
         const p = screenPos(logo);
@@ -80,10 +109,12 @@
         const p = screenPos(logo);
         return { x: p.x + rand(-p.w / 3, p.w / 3), y: p.y - p.h / 2 };
       }, 0.35),
+      /* steam stays particle-generated, rising off the sprite mug */
       VT.fx.steam(() => {
+        const mug = document.getElementById('deco-mug');
         if (!mug) return null;
         const p = screenPos(mug);
-        return { x: p.x - 6, y: p.y - p.h / 2 - 4 };
+        return { x: p.x - p.w * 0.1, y: p.y - p.h * 0.42 };
       }, 2.5),
     ];
   }
@@ -147,20 +178,22 @@
   async function powerOff() {
     VT.audio.play('powerOff');
     stopAmbient();
+    menuLogo && menuLogo.stopTicker();
     const off = document.getElementById('tv-off');
     off.classList.remove('on'); off.classList.add('off');
-    document.getElementById('power-led').classList.add('off');
     setTimeout(() => document.body.classList.add('tv-dead'), 350);
   }
 
   window.VT.powerOn = async () => {
     const off = document.getElementById('tv-off');
     document.body.classList.remove('tv-dead');
-    document.getElementById('power-led').classList.remove('off');
     VT.audio.play('powerOn');
     off.classList.remove('off'); off.classList.add('on');
     setTimeout(() => off.classList.remove('on'), 750);
-    if (VT.screens.current === 'menu') startAmbient();
+    if (VT.screens.current === 'menu') {
+      startAmbient();
+      menuLogo && menuLogo.startTicker();
+    }
   };
 
   /* ---------------- wiring ---------------- */
@@ -184,15 +217,16 @@
       const ico = b.querySelector('.mbtn-ico');
       VT.sprites.mount(ico, ico.dataset.ico, { scale: 3, color: '#1b1914' });
     });
-    document.getElementById('power-btn').addEventListener('click', () => {
+    /* tap the dead tube to power it back on */
+    document.getElementById('wake-hint').addEventListener('click', () => {
       if (document.body.classList.contains('tv-dead')) VT.powerOn();
-      else powerOff();
     });
     /* logo reacts to petting */
     const logo = document.getElementById('menu-logo');
     logo.addEventListener('click', () => {
       const p = screenPos(logo);
       VT.audio.play('chain');
+      menuLogo.wave();
       VT.fx.burst(p.x, p.y, { count: 22, speed: 200 });
       for (let i = 0; i < 3; i++) VT.fx.heart(p.x + rand(-80, 80), p.y + rand(-20, 20), 3);
     });
@@ -200,12 +234,20 @@
 
   VT.menuScreen = {
     init() {
+      menuLogo = VT.logo.mount(document.getElementById('menu-logo'), 'В ТЕМУ!');
       decorate();
       bind();
       VT.screens.register('menu', {
         el: document.getElementById('view-menu'),
-        onEnter: startAmbient,
-        onExit: stopAmbient,
+        onEnter() {
+          placeProps();
+          startAmbient();
+          menuLogo.startTicker();
+        },
+        onExit() {
+          stopAmbient();
+          menuLogo.stopTicker();
+        },
       });
     },
   };

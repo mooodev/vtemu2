@@ -14,6 +14,17 @@
 
   const MAX_MISTAKES = 4;
 
+  /* base font size by word length; fitText then fine-tunes so the
+     word always fits its tile, whatever the screen width */
+  function sizeFor(word) {
+    const n = word.length;
+    if (n <= 5) return 16;
+    if (n <= 7) return 15;
+    if (n <= 9) return 13;
+    if (n <= 11) return 11;
+    return 10;
+  }
+
   class Board {
     constructor({ puzzle, grid, wrap, solvedStack, wires, on }) {
       this.puzzle = puzzle;
@@ -43,6 +54,10 @@
         const tile = el('button', 'tile deal');
         tile.dataset.word = word;
         tile.style.animationDelay = i * 35 + 'ms';
+        /* a bit of typographic variety: some tiles bold, some italic */
+        const r = Math.random();
+        if (r < 0.16) tile.classList.add('t-italic');
+        else if (r < 0.34) tile.classList.add('t-bold');
         tile.appendChild(el('span', '', word));
         tile.addEventListener('click', () => this.toggle(tile));
         tile.addEventListener('mouseenter', () => VT.audio.play('hover'));
@@ -50,8 +65,13 @@
         setTimeout(() => VT.audio.play('deal'), i * 35);
         setTimeout(() => tile.classList.remove('deal'), i * 35 + 500);
       });
-      requestAnimationFrame(() =>
-        this.grid.querySelectorAll('.tile > span').forEach((s) => fitText(s, 15, 9))
+      requestAnimationFrame(() => this.refit());
+    }
+
+    /** (Re)fit every tile label — called on deal and on resize. */
+    refit() {
+      this.grid.querySelectorAll('.tile > span').forEach((s) =>
+        fitText(s, sizeFor(s.textContent), 7)
       );
     }
 

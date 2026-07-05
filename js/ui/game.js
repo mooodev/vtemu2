@@ -14,6 +14,43 @@
   let seconds = 0;
   let finished = false;
 
+  /* ---------------- talking logo ---------------- */
+
+  const TITLE = 'В ТЕМУ!';
+  const PHRASES = {
+    congrats: ['КРАСАВА!', 'В ТОЧКУ!', 'ОГОНЬ!', 'ГЕНИЙ!', 'МОЩНО!'],
+    snark:    ['НУ-НУ...', 'СЕРЬЁЗНО?', 'МИМО!', 'ОЙ-ОЙ...', 'НЕ В ТЕМУ!', 'ХМ-М-М...'],
+    idle:     ['ДУМАЙ!', 'НЕ СПИ!', 'ТИК-ТАК...', 'СЛОВА ЖДУТ', 'НУ ЧТО?'],
+  };
+  let gameLogo = null;
+  let revertT = null;
+  let idleT = null;
+
+  /** Show a remark on the header logo, then swap back to the title. */
+  function flashPhrase(kind, hold = 2800) {
+    if (!gameLogo) return;
+    const tone = kind === 'congrats' ? 'tone-gold' : kind === 'snark' ? 'tone-red' : '';
+    clearTimeout(revertT);
+    gameLogo.setText(VT.util.choice(PHRASES[kind]), tone);
+    revertT = setTimeout(() => gameLogo.setText(TITLE), hold);
+  }
+
+  /* an occasional unprompted remark while the player is thinking */
+  function scheduleIdle() {
+    clearTimeout(idleT);
+    idleT = setTimeout(() => {
+      if (!finished && VT.screens.current === 'game' && gameLogo.text === TITLE) {
+        flashPhrase('idle');
+      }
+      scheduleIdle();
+    }, VT.util.rand(14000, 24000));
+  }
+
+  function stopLogoTalk() {
+    clearTimeout(revertT); revertT = null;
+    clearTimeout(idleT); idleT = null;
+  }
+
   /* ---------------- HUD ---------------- */
 
   function renderHearts(left) {
@@ -77,6 +114,8 @@
   function onWin() {
     finished = true;
     stopTimer();
+    stopLogoTalk();
+    gameLogo.setText('ПОБЕДА!', 'tone-gold');
     VT.audio.play('win');
     VT.fx.confettiRain(3);
     setTimeout(() => VT.fx.confettiRain(2), 800);
@@ -94,6 +133,8 @@
   function onLose() {
     finished = true;
     stopTimer();
+    stopLogoTalk();
+    gameLogo.setText('УВЫ...', 'tone-red');
     VT.audio.play('lose');
     VT.modal.open({
       title: 'ПОРАЖЕНИЕ', icon: 'heartDead', sub: 'ПОПЫТКИ ЗАКОНЧИЛИСЬ',
@@ -110,6 +151,9 @@
 
   function restart() {
     finished = false;
+    stopLogoTalk();
+    if (gameLogo.text !== TITLE) gameLogo.setText(TITLE);
+    scheduleIdle();
     board = new VT.Board({
       puzzle: VT.data.puzzles[0],
       grid: document.getElementById('grid'),
@@ -126,11 +170,12 @@
 
   function onBoardEvent(name, a, b) {
     if (name === 'select') setHint(a);
-    else if (name === 'mistake') loseHeart(a);
+    else if (name === 'mistake') { loseHeart(a); if (a > 0) flashPhrase('snark'); }
     else if (name === 'win') onWin();
     else if (name === 'lose') onLose();
     else if (name === 'solved') {
       VT.toast(`НАЙДЕНО: ${a.title}`, 'good', 1400);
+      if (board.solvedCount < 4) flashPhrase('congrats');
       wires.resize();
     }
   }
@@ -160,10 +205,18 @@
       else if (e.key === 'Escape') board.deselectAll();
       else if (e.key.toLowerCase() === 's' || e.key.toLowerCase() === 'ы') board.shuffleTiles();
     });
+
+    /* refit tile labels when the viewport changes (rotation etc.) */
+    let refitT = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(refitT);
+      refitT = setTimeout(() => board && board.refit(), 140);
+    });
   }
 
   VT.gameScreen = {
     init() {
+      gameLogo = VT.logo.mount(document.getElementById('game-logo'), TITLE);
       wires = new VT.WireLayer(
         document.getElementById('wires'),
         document.getElementById('board-wrap')
@@ -174,10 +227,13 @@
         el: document.getElementById('view-game'),
         onEnter() {
           wires.start();
+          gameLogo.startTicker(2.2, 5);
           restart();
         },
         onExit() {
           stopTimer();
+          stopLogoTalk();
+          gameLogo.stopTicker();
           wires.stop();
           document.getElementById('modal-root').innerHTML = '';
         },

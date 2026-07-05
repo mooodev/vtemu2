@@ -1,7 +1,7 @@
 /* ============================================================
    В ТЕМУ! — ui.css
    Shared components: pixel buttons, chips, status bar,
-   toasts, modals, toggles.
+   toasts, modals, toggles. Sized with clamp() for mobile.
    ============================================================ */
 
 /* ---- pixel bevel helper (khaki plastic card) ------------- */
@@ -22,10 +22,10 @@
 
 .mbtn {
   position: relative;
-  display: flex; align-items: center; gap: 18px;
-  width: 460px; height: 64px;
-  padding: 0 26px;
-  font-family: var(--px-font); font-size: 20px; letter-spacing: 2px;
+  display: flex; align-items: center; gap: clamp(12px, 3vw, 18px);
+  width: 100%; height: clamp(52px, 11vw, 64px);
+  padding: 0 clamp(16px, 4vw, 26px);
+  font-family: var(--px-font); font-size: clamp(14px, 4.2vw, 20px); letter-spacing: 2px;
   color: var(--ink);
   background: linear-gradient(#ddd0a2, var(--khaki) 55%, #c4b483);
   border: 3px solid var(--ink);
@@ -40,7 +40,27 @@
 .mbtn .mbtn-label { transform: translateY(1px); }
 .mbtn .mbtn-ico { display: inline-flex; width: 28px; justify-content: center; }
 
-.mbtn:hover, .mbtn.kb-focus {
+@media (hover: hover) {
+  .mbtn:hover {
+    background: linear-gradient(#eee2b4, #e0d3a0 55%, #cfbf8d);
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 3px 0 rgba(255,255,255,.6),
+      inset 0 -4px 0 rgba(90,75,40,.5),
+      0 7px 0 var(--ink),
+      0 9px 18px rgba(0,0,0,.45);
+  }
+  .mbtn.primary:hover {
+    background: linear-gradient(#daf4a4, #b3d56e 55%, #8cb14c);
+    box-shadow:
+      inset 0 3px 0 rgba(255,255,255,.55),
+      inset 0 -4px 0 rgba(50,70,20,.55),
+      0 7px 0 var(--ink),
+      0 9px 20px rgba(120,180,60,.35);
+  }
+  .mbtn:hover::before { opacity: 1; transform: translateX(0); }
+}
+.mbtn.kb-focus {
   background: linear-gradient(#eee2b4, #e0d3a0 55%, #cfbf8d);
   transform: translateY(-2px);
   box-shadow:
@@ -64,14 +84,6 @@
     inset 0 -4px 0 rgba(50,70,20,.55),
     0 5px 0 var(--ink);
 }
-.mbtn.primary:hover, .mbtn.primary.kb-focus {
-  background: linear-gradient(#daf4a4, #b3d56e 55%, #8cb14c);
-  box-shadow:
-    inset 0 3px 0 rgba(255,255,255,.55),
-    inset 0 -4px 0 rgba(50,70,20,.55),
-    0 7px 0 var(--ink),
-    0 9px 20px rgba(120,180,60,.35);
-}
 
 /* sliding cursor chevron that appears on hover */
 .mbtn::before {
@@ -82,16 +94,16 @@
   opacity: 0; transform: translateX(-8px);
   transition: opacity .12s, transform .15s ease-out;
 }
-.mbtn:hover::before, .mbtn.kb-focus::before { opacity: 1; transform: translateX(0); }
+.mbtn.kb-focus::before { opacity: 1; transform: translateX(0); }
 
 /* ============================================================
    Small control buttons (game screen)
    ============================================================ */
 
 .cbtn {
-  display: inline-flex; align-items: center; gap: 10px;
-  height: 52px; padding: 0 22px;
-  font-family: var(--px-font); font-size: 14px; letter-spacing: 1px;
+  display: inline-flex; align-items: center; gap: clamp(6px, 1.6vw, 10px);
+  height: clamp(42px, 9.6vw, 52px); padding: 0 clamp(10px, 2.6vw, 22px);
+  font-family: var(--px-font); font-size: clamp(10px, 2.6vw, 14px); letter-spacing: 1px;
   color: var(--ink);
   background: linear-gradient(#ddd0a2, var(--khaki) 55%, #c4b483);
   border: 3px solid var(--ink); border-radius: 7px;
@@ -99,12 +111,14 @@
   cursor: pointer;
   transition: transform .08s, box-shadow .08s, background .1s, filter .1s;
 }
-.cbtn:hover { background: linear-gradient(#eee2b4, #e0d3a0 55%, #cfbf8d); transform: translateY(-1px);
-  box-shadow: inset 0 2px 0 rgba(255,255,255,.55), inset 0 -3px 0 rgba(90,75,40,.5), 0 5px 0 var(--ink); }
+@media (hover: hover) {
+  .cbtn:hover { background: linear-gradient(#eee2b4, #e0d3a0 55%, #cfbf8d); transform: translateY(-1px);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.55), inset 0 -3px 0 rgba(90,75,40,.5), 0 5px 0 var(--ink); }
+  .cbtn.primary:hover { background: linear-gradient(#daf4a4, #b3d56e 55%, #8cb14c); }
+}
 .cbtn:active { transform: translateY(2px); box-shadow: inset 0 2px 0 rgba(255,255,255,.4), 0 1px 0 var(--ink); }
 
 .cbtn.primary { background: linear-gradient(#cbe98d, var(--green) 55%, #7da13e); }
-.cbtn.primary:hover { background: linear-gradient(#daf4a4, #b3d56e 55%, #8cb14c); }
 .cbtn.primary:not(:disabled) { animation: submit-ready 1.4s ease-in-out infinite; }
 @keyframes submit-ready {
   0%,100% { filter: brightness(1); }
@@ -120,7 +134,8 @@
 }
 
 .icon-btn {
-  width: 52px; height: 52px;
+  width: clamp(44px, 10vw, 52px); height: clamp(44px, 10vw, 52px);
+  flex: 0 0 auto;
   display: inline-flex; align-items: center; justify-content: center;
   background: linear-gradient(#ddd0a2, var(--khaki) 55%, #c4b483);
   border: 3px solid var(--ink); border-radius: 7px;
@@ -128,7 +143,9 @@
   cursor: pointer;
   transition: transform .08s, box-shadow .08s;
 }
-.icon-btn:hover { transform: translateY(-1px); box-shadow: inset 0 2px 0 rgba(255,255,255,.55), 0 5px 0 var(--ink); }
+@media (hover: hover) {
+  .icon-btn:hover { transform: translateY(-1px); box-shadow: inset 0 2px 0 rgba(255,255,255,.55), 0 5px 0 var(--ink); }
+}
 .icon-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
 
 /* ============================================================
@@ -136,9 +153,10 @@
    ============================================================ */
 
 .chip {
-  display: inline-flex; align-items: center; gap: 10px;
-  height: 44px; padding: 0 16px;
-  font-size: 15px; color: var(--green-text);
+  display: inline-flex; align-items: center; gap: clamp(6px, 1.6vw, 10px);
+  height: clamp(38px, 8.6vw, 44px); padding: 0 clamp(10px, 2.4vw, 16px);
+  flex: 0 0 auto;
+  font-size: clamp(11px, 2.8vw, 15px); color: var(--green-text);
   background: var(--panel-2);
   border: 3px solid var(--ink); border-radius: 7px;
   box-shadow: inset 0 0 0 1px rgba(170,200,110,.22), inset 0 2px 6px rgba(0,0,0,.5);
@@ -150,41 +168,44 @@
 
 .status-bar {
   margin-top: auto;
-  width: 100%; min-height: 84px;
-  display: flex; align-items: stretch; gap: 12px;
-  padding: 10px 14px;
+  width: 100%; max-width: 900px; min-height: clamp(60px, 10vh, 84px);
+  display: flex; align-items: stretch; justify-content: space-between; gap: 6px;
+  padding: clamp(6px, 1.4vw, 10px) clamp(8px, 1.8vw, 14px);
   background: var(--panel);
   border: 3px solid var(--ink); border-radius: 10px;
   box-shadow: inset 0 0 0 1px rgba(170,200,110,.16), inset 0 3px 10px rgba(0,0,0,.55);
-  font-size: 11px; color: var(--cream-dark);
+  font-size: clamp(9px, 2vw, 11px); color: var(--cream-dark);
 }
-.sb-cell { display: flex; flex-direction: column; justify-content: center; gap: 7px; padding: 0 12px; }
+.sb-cell { display: flex; flex-direction: column; justify-content: center; gap: 7px; padding: 0 clamp(6px, 1.4vw, 12px); }
 .sb-cell + .sb-cell { border-left: 2px dotted #3a4028; }
-.sb-player { flex-direction: row; align-items: center; gap: 12px; }
+.sb-player { flex-direction: row; align-items: center; gap: clamp(8px, 1.8vw, 12px); }
 .sb-player .sb-col { display: flex; flex-direction: column; gap: 7px; }
 .sb-row { display: flex; align-items: center; gap: 8px; }
 .sb-pips { display: inline-flex; gap: 3px; }
 .sb-pips i { width: 9px; height: 9px; background: var(--red); box-shadow: inset -1px -2px 0 rgba(0,0,0,.35); }
 .sb-pips i.dim { background: #3a4028; box-shadow: none; }
 .sb-level { align-items: center; text-align: center; flex: 0 0 auto; }
-.sb-level .sb-num { font-size: 22px; color: var(--green); text-shadow: 0 0 12px rgba(157,193,87,.55); }
+.sb-level .sb-num { font-size: clamp(16px, 3.6vw, 22px); color: var(--green); text-shadow: 0 0 12px rgba(157,193,87,.55); }
 .sb-level .sb-cap { color: var(--dim); }
 .sb-sys { margin-left: auto; flex-direction: row; align-items: center; gap: 14px; }
 .sb-sys .sb-col { display: flex; flex-direction: column; gap: 5px; color: var(--dim); }
 .sb-sys .sb-col b { color: var(--cream-dark); font-weight: 400; }
+
+@media (max-width: 760px) { .sb-sys { display: none; } .sb-level { margin-left: auto; } }
+@media (max-width: 470px) { .sb-level { display: none; } .sb-pips { display: none; } }
 
 /* ============================================================
    Toasts
    ============================================================ */
 
 #toast-root {
-  position: absolute; top: 130px; left: 0; right: 0; z-index: 35;
+  position: absolute; top: clamp(90px, 16vh, 130px); left: 0; right: 0; z-index: 35;
   display: flex; flex-direction: column; align-items: center; gap: 8px;
   pointer-events: none;
 }
 .toast {
-  padding: 14px 24px;
-  font-size: 14px; letter-spacing: 1px; color: var(--ink);
+  padding: clamp(10px, 2.4vw, 14px) clamp(16px, 4vw, 24px);
+  font-size: clamp(11px, 2.8vw, 14px); letter-spacing: 1px; color: var(--ink);
   background: linear-gradient(#eee2b4, var(--khaki));
   border: 3px solid var(--ink); border-radius: 7px;
   box-shadow: 0 4px 0 var(--ink), 0 10px 24px rgba(0,0,0,.5);
@@ -213,7 +234,7 @@
 
 .modal {
   position: absolute; left: 50%; top: 50%;
-  min-width: 430px; max-width: 640px;
+  min-width: min(430px, 94vw); max-width: min(640px, 94vw);
   transform: translate(-50%, -50%);
   background: var(--panel-2);
   border: 3px solid var(--ink); border-radius: 10px;
@@ -221,7 +242,7 @@
     inset 0 0 0 2px rgba(170,200,110,.25),
     inset 0 4px 14px rgba(0,0,0,.5),
     0 16px 40px rgba(0,0,0,.6);
-  padding: 26px 30px 26px;
+  padding: clamp(18px, 4.6vw, 26px) clamp(16px, 4.6vw, 30px);
   pointer-events: auto;
   animation: modal-in .22s cubic-bezier(.34,1.56,.64,1) both;
 }
@@ -242,13 +263,13 @@
 
 .modal-title {
   display: flex; align-items: center; justify-content: center; gap: 14px;
-  font-size: 19px; letter-spacing: 2px; color: var(--cream);
+  font-size: clamp(14px, 3.8vw, 19px); letter-spacing: 2px; color: var(--cream);
   text-align: center; margin-bottom: 6px;
   text-shadow: 3px 3px 0 rgba(0,0,0,.6);
 }
-.modal-sub { text-align: center; font-size: 11px; color: var(--green-text); margin-bottom: 18px; }
+.modal-sub { text-align: center; font-size: clamp(9px, 2.4vw, 11px); color: var(--green-text); margin-bottom: 18px; }
 .modal-body { display: flex; flex-direction: column; gap: 14px; align-items: center; }
-.modal-btns { display: flex; gap: 14px; justify-content: center; margin-top: 20px; }
+.modal-btns { display: flex; gap: clamp(8px, 2.4vw, 14px); justify-content: center; flex-wrap: wrap; margin-top: 20px; }
 
 .modal .dotted-rule {
   width: 100%; height: 3px; margin: 4px 0 12px;
@@ -262,7 +283,7 @@
   background: var(--panel);
   border: 2px solid var(--ink); border-radius: 7px;
   box-shadow: inset 0 0 0 1px rgba(170,200,110,.14);
-  font-size: 13px; color: var(--cream-dark);
+  font-size: clamp(11px, 2.8vw, 13px); color: var(--cream-dark);
 }
 .set-row .set-label { display: flex; align-items: center; gap: 12px; }
 

@@ -2,84 +2,72 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>В ТЕМУ! — СИСТЕМА 128</title>
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/ui.css">
 <link rel="stylesheet" href="css/screens.css">
 </head>
 <body>
-<div id="room">
-  <div id="monitor">
-    <div id="bezel">
-      <div id="screen">
-        <!-- ============ MENU ============ -->
-        <section class="view" id="view-menu">
-          <div class="menu-logo-zone">
-            <img id="menu-logo" src="assets/img/logo.png" alt="В ТЕМУ!" draggable="false">
-            <div class="deco-layer" id="menu-deco"></div>
-          </div>
-          <div class="tagline-row">
-            <span class="chev chev-l"></span>
-            <p class="tagline">НАЙДИ 4 ГРУППЫ СВЯЗАННЫХ СЛОВ</p>
-            <span class="chev chev-r"></span>
-          </div>
-          <nav class="menu-buttons" id="menu-buttons">
-            <button class="mbtn primary" data-action="play"><span class="mbtn-ico" data-ico="play"></span><span class="mbtn-label">ИГРАТЬ</span></button>
-            <button class="mbtn" data-action="modes"><span class="mbtn-ico" data-ico="grid"></span><span class="mbtn-label">РЕЖИМЫ</span></button>
-            <button class="mbtn" data-action="profile"><span class="mbtn-ico" data-ico="person"></span><span class="mbtn-label">ПРОФИЛЬ</span></button>
-            <button class="mbtn" data-action="settings"><span class="mbtn-ico" data-ico="gear"></span><span class="mbtn-label">НАСТРОЙКИ</span></button>
-            <button class="mbtn" data-action="exit"><span class="mbtn-ico" data-ico="exit"></span><span class="mbtn-label">ВЫХОД</span></button>
-          </nav>
-          <div class="side-deco" id="side-deco"></div>
-          <footer class="status-bar" data-statusbar></footer>
-        </section>
+<div id="screen">
+  <!-- ============ MENU ============ -->
+  <section class="view" id="view-menu">
+    <div class="menu-logo-zone">
+      <div id="menu-logo" class="logo-text logo-xl" aria-label="В ТЕМУ!"></div>
+      <div class="deco-layer" id="menu-deco"></div>
+    </div>
+    <div class="tagline-row">
+      <span class="chev chev-l"></span>
+      <p class="tagline">НАЙДИ 4 ГРУППЫ СВЯЗАННЫХ СЛОВ</p>
+      <span class="chev chev-r"></span>
+    </div>
+    <nav class="menu-buttons" id="menu-buttons">
+      <button class="mbtn primary" data-action="play"><span class="mbtn-ico" data-ico="play"></span><span class="mbtn-label">ИГРАТЬ</span></button>
+      <button class="mbtn" data-action="modes"><span class="mbtn-ico" data-ico="grid"></span><span class="mbtn-label">РЕЖИМЫ</span></button>
+      <button class="mbtn" data-action="profile"><span class="mbtn-ico" data-ico="person"></span><span class="mbtn-label">ПРОФИЛЬ</span></button>
+      <button class="mbtn" data-action="settings"><span class="mbtn-ico" data-ico="gear"></span><span class="mbtn-label">НАСТРОЙКИ</span></button>
+      <button class="mbtn" data-action="exit"><span class="mbtn-ico" data-ico="exit"></span><span class="mbtn-label">ВЫХОД</span></button>
+    </nav>
+    <div class="side-deco" id="side-deco"></div>
+    <footer class="status-bar" data-statusbar></footer>
+  </section>
 
-        <!-- ============ GAME ============ -->
-        <section class="view" id="view-game" hidden>
-          <header class="game-header">
-            <button class="icon-btn" id="btn-back" title="В меню"><span data-ico="back"></span></button>
-            <img class="game-logo" src="assets/img/logo.png" alt="В ТЕМУ!" draggable="false">
-            <div class="chip" id="chip-timer"><span data-ico="clock"></span><span id="timer-val">0:00</span></div>
-          </header>
-          <p class="game-hint" id="game-hint">СОБЕРИ ЦЕПЬ ИЗ 4 СЛОВ</p>
-          <div class="game-mid">
-            <div id="solved-stack"></div>
-            <div id="board-wrap">
-              <div id="grid"></div>
-              <canvas id="wires"></canvas>
-            </div>
-            <div class="game-controls">
-              <div class="hearts" id="hearts"><span class="hearts-label">ПОПЫТКИ</span><span id="hearts-row"></span></div>
-              <div class="ctrl-btns">
-                <button class="cbtn" id="btn-shuffle"><span data-ico="shuffle"></span>МЕШАТЬ</button>
-                <button class="cbtn" id="btn-clear"><span data-ico="cross"></span>СБРОС</button>
-                <button class="cbtn primary" id="btn-submit" disabled><span data-ico="check"></span>ПРОВЕРИТЬ</button>
-              </div>
-            </div>
-          </div>
-          <footer class="status-bar" data-statusbar></footer>
-        </section>
-
-        <!-- overlays that live inside the CRT glass -->
-        <div id="toast-root"></div>
-        <div id="modal-root"></div>
-        <canvas id="fx-canvas"></canvas>
-        <div id="tv-static"></div>
-        <div id="scanlines"></div>
-        <div id="vignette"></div>
-        <div id="glass"></div>
-        <div id="tv-off"></div>
+  <!-- ============ GAME ============ -->
+  <section class="view" id="view-game" hidden>
+    <header class="game-header">
+      <button class="icon-btn" id="btn-back" title="В меню"><span data-ico="back"></span></button>
+      <div class="game-logo"><div id="game-logo" class="logo-text logo-s" aria-label="В ТЕМУ!"></div></div>
+      <div class="chip" id="chip-timer"><span data-ico="clock"></span><span id="timer-val">0:00</span></div>
+    </header>
+    <p class="game-hint" id="game-hint">СОБЕРИ ЦЕПЬ ИЗ 4 СЛОВ</p>
+    <div class="game-mid">
+      <div id="solved-stack"></div>
+      <div id="board-wrap">
+        <div id="grid"></div>
+        <canvas id="wires"></canvas>
       </div>
-      <div class="bezel-bottom">
-        <div class="brand-plate">СИСТЕМА 128</div>
-        <div class="power-group">
-          <div id="power-led"></div>
-          <button id="power-btn" title="POWER"></button>
+      <div class="game-controls">
+        <div class="hearts" id="hearts"><span class="hearts-label">ПОПЫТКИ</span><span id="hearts-row"></span></div>
+        <div class="ctrl-btns">
+          <button class="cbtn" id="btn-shuffle"><span data-ico="shuffle"></span>МЕШАТЬ</button>
+          <button class="cbtn" id="btn-clear"><span data-ico="cross"></span>СБРОС</button>
+          <button class="cbtn primary" id="btn-submit" disabled><span data-ico="check"></span>ПРОВЕРИТЬ</button>
         </div>
       </div>
     </div>
-  </div>
+    <footer class="status-bar" data-statusbar></footer>
+  </section>
+
+  <!-- overlays that live inside the CRT glass -->
+  <div id="toast-root"></div>
+  <div id="modal-root"></div>
+  <canvas id="fx-canvas"></canvas>
+  <div id="tv-static"></div>
+  <div id="scanlines"></div>
+  <div id="vignette"></div>
+  <div id="glass"></div>
+  <div id="tv-off"></div>
+  <div id="wake-hint"><span>НАЖМИ, ЧТОБЫ ВКЛЮЧИТЬ</span></div>
 </div>
 
 <script src="js/core/util.js"></script>
@@ -90,6 +78,7 @@
 <script src="js/game/data.js"></script>
 <script src="js/game/wires.js"></script>
 <script src="js/game/board.js"></script>
+<script src="js/ui/logo.js"></script>
 <script src="js/ui/menu.js"></script>
 <script src="js/ui/game.js"></script>
 <script src="js/main.js"></script>

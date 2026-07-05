@@ -1,7 +1,82 @@
 /* ============================================================
    В ТЕМУ! — screens.css
-   Menu screen + game screen layouts, tiles, solved banners.
+   Live text logo, menu screen + game screen layouts, tiles,
+   solved banners. Everything sized with clamp() so it works
+   from phones to desktops.
    ============================================================ */
+
+/* ============================================================
+   LOGO — real font letters, individually animated
+   ============================================================ */
+
+.logo-text {
+  --lg-fill: var(--cream);
+  display: inline-flex;
+  gap: .1em;
+  white-space: nowrap;
+  line-height: 1;
+}
+.logo-xl { font-size: clamp(30px, 9.4vw, 70px); }
+.logo-s  { font-size: clamp(11px, 2.7vw, 19px); }
+
+.logo-text.tone-gold { --lg-fill: var(--gold-bright); }
+.logo-text.tone-red  { --lg-fill: #f2a28c; }
+
+/* outer span: staggered hover-bob (wave), slight alternating tilt */
+.lg-l {
+  display: inline-block;
+  animation: lg-bob 2.9s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * -.24s);
+}
+.lg-l:nth-child(odd)  { rotate: -2.4deg; }
+.lg-l:nth-child(even) { rotate: 1.8deg; }
+.lg-sp { width: .5em; }
+@keyframes lg-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-.16em); }
+}
+
+/* inner span: color, chunky extruded retro shadow, poke anims */
+.lg-c {
+  display: inline-block;
+  color: var(--lg-fill);
+  text-shadow:
+    .05em 0 var(--ink), -.05em 0 var(--ink), 0 .05em var(--ink), 0 -.05em var(--ink),
+    .036em .036em var(--ink), -.036em .036em var(--ink),
+    .036em -.036em var(--ink), -.036em -.036em var(--ink),
+    .1em .1em 0 #b8462e,
+    .16em .16em 0 #2e567f,
+    .24em .24em 0 rgba(0,0,0,.35);
+}
+
+.lg-c.lg-squish { animation: lg-squish .55s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes lg-squish {
+  30% { transform: scale(1.3, .55); }
+  60% { transform: scale(.82, 1.28); }
+  100% { transform: scale(1); }
+}
+.lg-c.lg-jump { animation: lg-jump .6s ease both; }
+@keyframes lg-jump {
+  30% { transform: translateY(-.4em) scale(1.08); }
+  60% { transform: translateY(.06em) scale(.94, .88); }
+  100% { transform: translateY(0) scale(1); }
+}
+.lg-c.lg-wob { animation: lg-wob .6s ease-in-out both; }
+@keyframes lg-wob {
+  25% { transform: rotate(15deg) scale(1.06); }
+  60% { transform: rotate(-11deg); }
+  100% { transform: rotate(0); }
+}
+
+/* letter-by-letter text swap (game remarks) */
+.lg-c.lg-out { animation: lg-out .2s ease-in both; }
+@keyframes lg-out {
+  to { transform: scale(1.5, .08) translateY(.3em); opacity: 0; }
+}
+.lg-c.lg-in { animation: lg-in .32s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes lg-in {
+  from { transform: scale(.2, 1.7) translateY(.45em); opacity: 0; }
+}
 
 /* ============================================================
    MENU
@@ -9,21 +84,12 @@
 
 .menu-logo-zone {
   position: relative;
-  margin-top: 26px;
-  width: 620px; height: 190px;
+  margin-top: clamp(10px, 4vh, 40px);
+  width: min(620px, 100%);
+  min-height: clamp(80px, 20vw, 170px);
   display: flex; align-items: center; justify-content: center;
   flex: 0 0 auto;
-}
-
-#menu-logo {
-  width: 540px;
-  animation: logo-bob 3.4s ease-in-out infinite;
-  filter: drop-shadow(0 10px 0 rgba(0,0,0,.4));
   z-index: 2;
-}
-@keyframes logo-bob {
-  0%, 100% { transform: translateY(0) rotate(-.6deg); }
-  50%      { transform: translateY(-10px) rotate(.6deg); }
 }
 
 /* deterministic CSS twinkles around the logo (canvas adds random ones) */
@@ -38,9 +104,10 @@
   50%      { transform: scale(1.15) rotate(4deg); opacity: 1; }
 }
 
-.tagline-row { margin-top: 8px; flex: 0 0 auto; }
+.tagline-row { margin-top: clamp(8px, 2vh, 16px); flex: 0 0 auto; }
 .tagline {
-  font-size: 14px; letter-spacing: 1px; color: var(--green-text);
+  font-size: clamp(9px, 2.6vw, 14px); letter-spacing: 1px; color: var(--green-text);
+  text-align: center;
   text-shadow: 0 0 14px rgba(157,193,87,.4), 2px 2px 0 rgba(0,0,0,.7);
   animation: tagline-glow 2.6s ease-in-out infinite;
 }
@@ -50,22 +117,29 @@
 }
 .chev { animation: chev-pulse 1.2s steps(2) infinite; }
 @keyframes chev-pulse { 50% { opacity: .45; } }
+@media (max-width: 620px) { .chev { display: none; } }
 
 .menu-buttons {
-  margin-top: 26px;
-  display: flex; flex-direction: column; gap: 16px;
+  margin-top: clamp(14px, 3.2vh, 30px);
+  width: min(460px, 100%);
+  display: flex; flex-direction: column; gap: clamp(10px, 1.8vh, 16px);
   flex: 0 0 auto;
   z-index: 3;
 }
 
-/* floating side decorations */
+/* floating side props — PNG pixel sprites, reshuffled every visit */
 .side-deco { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
 .side-deco .sd {
   position: absolute;
+  transform: translate(-50%, -50%);
+}
+.side-deco .sd-bob {
+  display: block;
   animation: sd-float var(--sd-dur, 4s) ease-in-out infinite;
   animation-delay: var(--sd-delay, 0s);
   filter: drop-shadow(4px 6px 0 rgba(0,0,0,.35));
 }
+.side-deco .sd img { display: block; }
 @keyframes sd-float {
   0%,100% { transform: translateY(0) rotate(-2deg); }
   50%     { transform: translateY(-12px) rotate(2deg); }
@@ -75,25 +149,28 @@
   background-image: radial-gradient(#3d472a 2px, transparent 2.5px);
   background-size: 18px 18px;
 }
+@media (max-width: 560px) { .side-deco .dots { display: none; } }
 
 /* ============================================================
    GAME
    ============================================================ */
 
 .game-header {
-  width: 100%;
+  width: 100%; max-width: 900px;
   display: flex; align-items: center; justify-content: space-between;
+  gap: 10px;
   flex: 0 0 auto;
 }
 .game-logo {
-  height: 52px;
-  animation: logo-bob 3.4s ease-in-out infinite;
+  flex: 1 1 auto; min-width: 0;
+  display: flex; justify-content: center;
   filter: drop-shadow(0 4px 0 rgba(0,0,0,.4));
 }
 
 .game-hint {
-  margin: 12px 0 4px;
-  font-size: 11px; letter-spacing: 1px; color: var(--dim);
+  margin: clamp(8px, 1.6vh, 14px) 0 4px;
+  font-size: clamp(9px, 2.4vw, 11px); letter-spacing: 1px; color: var(--dim);
+  text-align: center;
   animation: hint-fade .4s ease both;
 }
 .game-hint.lit { color: var(--green-text); text-shadow: 0 0 12px rgba(157,193,87,.5); }
@@ -102,17 +179,17 @@
 /* middle block: solved stack + board + controls, vertically centered */
 .game-mid {
   flex: 1 1 auto;
-  width: 100%;
+  width: 100%; max-width: 900px;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 4px;
   min-height: 0;
-  padding-bottom: 14px;
+  padding-bottom: clamp(6px, 1.4vh, 14px);
 }
 
 /* solved group banners */
 #solved-stack {
   width: 100%; max-width: 760px;
-  display: flex; flex-direction: column; gap: 10px;
+  display: flex; flex-direction: column; gap: clamp(6px, 1vh, 10px);
   flex: 0 0 auto;
   margin-top: 8px;
 }
@@ -121,9 +198,9 @@
 .solved-banner {
   --gc: var(--green);
   position: relative;
-  min-height: 64px;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-  padding: 9px 16px;
+  min-height: clamp(46px, 9vw, 64px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  padding: clamp(6px, 1.4vw, 9px) 16px;
   border: 3px solid var(--ink); border-radius: 8px;
   background:
     linear-gradient(rgba(255,255,255,.22), rgba(255,255,255,0) 45%, rgba(0,0,0,.14)),
@@ -138,8 +215,8 @@
   70% { transform: scale(1.04); }
   100%{ transform: scale(1); opacity: 1; }
 }
-.solved-banner .sg-title { font-size: 14px; letter-spacing: 1px; text-shadow: 0 1px 0 rgba(255,255,255,.35); }
-.solved-banner .sg-words { font-size: 10px; opacity: .82; letter-spacing: 1px; }
+.solved-banner .sg-title { font-size: clamp(10px, 2.8vw, 14px); letter-spacing: 1px; text-align: center; text-shadow: 0 1px 0 rgba(255,255,255,.35); }
+.solved-banner .sg-words { font-size: clamp(7px, 2vw, 10px); opacity: .82; letter-spacing: 1px; text-align: center; }
 .solved-banner::after { /* shine sweep */
   content: ''; position: absolute; top: 0; bottom: 0; width: 60px;
   background: linear-gradient(100deg, transparent, rgba(255,255,255,.5), transparent);
@@ -148,12 +225,15 @@
 @keyframes banner-shine { from { left: -80px; } to { left: 110%; } }
 
 /* the board */
-#board-wrap { position: relative; flex: 0 0 auto; margin-top: 6px; }
+#board-wrap {
+  position: relative; flex: 0 0 auto; margin-top: 6px;
+  width: min(760px, 100%);
+}
 
 #grid {
   display: grid;
-  grid-template-columns: repeat(4, 178px);
-  gap: 14px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(7px, 1.6vw, 14px);
   transition: opacity .2s;
 }
 
@@ -167,9 +247,10 @@
 /* ---- word tile ---- */
 .tile {
   position: relative;
-  height: 76px;
+  height: clamp(50px, 13vw, 76px);
+  min-width: 0;
   display: flex; align-items: center; justify-content: center;
-  padding: 6px 8px;
+  padding: 4px clamp(3px, 1vw, 8px);
   font-family: var(--px-font); font-size: 15px; letter-spacing: 0;
   color: var(--ink);
   background: linear-gradient(#ddd0a2, var(--khaki) 55%, #c4b483);
@@ -184,13 +265,20 @@
 }
 .tile span { pointer-events: none; transform: translateY(1px); white-space: nowrap; }
 
-.tile:hover {
-  background: linear-gradient(#eee2b4, #e0d3a0 55%, #cfbf8d);
-  transform: translateY(-2px);
-  box-shadow:
-    inset 0 3px 0 rgba(255,255,255,.55),
-    inset 0 -4px 0 rgba(90,75,40,.45),
-    0 6px 0 var(--ink), 0 8px 16px rgba(0,0,0,.4);
+/* word-length flavor: some tiles come out "bold", some "italic" */
+.tile.t-bold span { text-shadow: 1px 0 0 currentColor; letter-spacing: .5px; }
+.tile.t-italic span { transform: translateY(1px) skewX(-8deg); }
+
+@media (hover: hover) {
+  .tile:hover {
+    background: linear-gradient(#eee2b4, #e0d3a0 55%, #cfbf8d);
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 3px 0 rgba(255,255,255,.55),
+      inset 0 -4px 0 rgba(90,75,40,.45),
+      0 6px 0 var(--ink), 0 8px 16px rgba(0,0,0,.4);
+  }
+  .tile.sel:hover { filter: brightness(1.07); }
 }
 .tile:active { transform: translateY(2px) scale(.98); box-shadow: inset 0 2px 0 rgba(255,255,255,.4), 0 1px 0 var(--ink); }
 
@@ -211,15 +299,14 @@
   60% { transform: translateY(-4px) scale(1.07); }
   100% { transform: translateY(-3px) scale(1.03); }
 }
-.tile.sel:hover { filter: brightness(1.07); }
 
 /* chain-order badge on selected tiles */
 .tile.sel::after {
   content: attr(data-order);
-  position: absolute; top: -12px; right: -10px;
-  width: 24px; height: 24px;
+  position: absolute; top: -12px; right: -8px;
+  width: clamp(20px, 4.6vw, 24px); height: clamp(20px, 4.6vw, 24px);
   display: flex; align-items: center; justify-content: center;
-  font-size: 11px; color: #15200a;
+  font-size: clamp(9px, 2.2vw, 11px); color: #15200a;
   background: var(--green-bright);
   border: 3px solid var(--ink); border-radius: 6px;
   box-shadow: 0 2px 0 var(--ink), 0 0 12px rgba(160,220,90,.5);
@@ -267,10 +354,11 @@
 .game-controls {
   width: 100%; max-width: 760px;
   display: flex; align-items: center; justify-content: space-between;
-  margin-top: 22px;
+  flex-wrap: wrap; gap: 10px;
+  margin-top: clamp(12px, 2.2vh, 22px);
   flex: 0 0 auto;
 }
-.hearts { display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--dim); }
+.hearts { display: flex; align-items: center; gap: 12px; font-size: clamp(9px, 2.2vw, 11px); color: var(--dim); }
 #hearts-row { display: inline-flex; gap: 7px; }
 #hearts-row .hp { display: inline-flex; transition: transform .2s; }
 #hearts-row .hp.lost { animation: heart-break .7s ease both; }
@@ -280,7 +368,12 @@
   55% { transform: scale(.9) rotate(14deg) translateY(4px); filter: saturate(.4); }
   100%{ transform: scale(.85) rotate(22deg) translateY(10px); filter: saturate(0) brightness(.55); opacity: .5; }
 }
-.ctrl-btns { display: flex; gap: 12px; }
+.ctrl-btns { display: flex; gap: clamp(6px, 1.4vw, 12px); flex-wrap: wrap; }
+
+@media (max-width: 640px) {
+  .game-controls { justify-content: center; }
+  .hearts-label { display: none; }
+}
 
 /* board shake on wrong answer */
 #board-wrap.board-shake { animation: board-shake .4s steps(8) both; }
@@ -294,9 +387,9 @@
 
 /* ---- win/lose modal extras ---- */
 .result-stats {
-  display: flex; gap: 26px; justify-content: center;
-  font-size: 12px; color: var(--cream-dark);
+  display: flex; gap: clamp(16px, 4vw, 26px); justify-content: center;
+  font-size: clamp(10px, 2.6vw, 12px); color: var(--cream-dark);
 }
 .result-stats .rs { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.result-stats .rs b { font-size: 20px; color: var(--gold); font-weight: 400; text-shadow: 2px 2px 0 rgba(0,0,0,.5); }
+.result-stats .rs b { font-size: clamp(16px, 4.2vw, 20px); color: var(--gold); font-weight: 400; text-shadow: 2px 2px 0 rgba(0,0,0,.5); }
 .reveal-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }

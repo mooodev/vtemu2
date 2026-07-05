@@ -35,11 +35,8 @@
     return e;
   };
 
-  /** Current scale factor of the monitor (CSS transform). */
-  util.monScale = () => {
-    const mon = document.getElementById('monitor');
-    return mon.getBoundingClientRect().width / mon.offsetWidth;
-  };
+  /** Legacy monitor scale — layout is untransformed & responsive now. */
+  util.monScale = () => 1;
 
   /** Position of an element's center in #screen-local coordinates. */
   util.screenPos = (el) => {

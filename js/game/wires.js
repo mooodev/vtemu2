@@ -68,12 +68,12 @@
 
     /* ------------------------------------------------ topology */
 
-    /** Rebuild wire set from the ordered selection chain. */
+    /** Rebuild wire set from the ordered selection chain.
+        The chain stays open — no wire from the 4th tile back
+        to the 1st; a full chain just heats the existing wires. */
     setChain(tiles) {
       const want = [];
       for (let i = 1; i < tiles.length; i++) want.push([tiles[i - 1], tiles[i]]);
-      const closing = tiles.length === 4;
-      if (closing) want.push([tiles[tiles.length - 1], tiles[0]]);
 
       const wantKeys = new Set(want.map(([a, b]) => keyOf(a, b)));
 
@@ -92,7 +92,7 @@
           });
         }
       }
-      this.complete = closing;
+      this.complete = tiles.length === 4;
     }
 
     /** Retract everything (deselect-all / after submit). */
