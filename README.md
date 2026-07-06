@@ -2,18 +2,19 @@
 
 A polished 90s-CRT prototype of a Russian *Connections*-style word game:
 find 4 groups of 4 words linked by a hidden meaning. Selected words are
-physically linked with animated pixel wires; close the chain of 4 and the
-circuit lights up.
+physically linked with animated pixel wires; link all 4 and the whole
+chain heats up. Fully responsive — the CRT tube fills the viewport and
+works on phones (portrait and landscape).
 
 **Run it:** just open `index.html` in a browser (no build, no dependencies).
 
 ## Controls
 
-- Click tiles to link them into a chain (max 4). Click again to unlink.
+- Click/tap tiles to link them into a chain (max 4). Click again to unlink.
 - `ПРОВЕРИТЬ` / **Enter** — submit the chain.
 - `МЕШАТЬ` / **S** — shuffle tiles. `СБРОС` / **Esc** — clear selection.
 - 4 mistakes = defeat. ВЫХОД in the menu actually powers the CRT down —
-  the power button on the bezel turns it back on.
+  tap the dead screen to turn it back on.
 
 ## Dev routes (URL hash)
 
@@ -31,11 +32,11 @@ loaded in dependency order from `index.html`:
 
 ```
 css/
-  base.css        tokens, font-face, CRT shell, tube overlays, power fx
+  base.css        tokens, font-face, fullscreen tube, overlays, power fx
   ui.css          buttons, chips, status bar, toasts, modals, toggles
-  screens.css     menu + game layouts, tiles, banners, badges
+  screens.css     text logo, menu + game layouts, tiles, banners, badges
 js/
-  core/util.js       helpers: rand/easing/DOM, monitor-scale math, FLIP
+  core/util.js       helpers: rand/easing/DOM, FLIP, fitText
   core/sprites.js    pixel-art factory — sprites are text grids → canvas
   core/audio.js      chiptune SFX from raw WebAudio oscillators
   core/particles.js  sparkles / hearts / confetti / steam + emitters
@@ -43,9 +44,10 @@ js/
   game/data.js       puzzle definitions
   game/wires.js      WireLayer — animated pixel connections canvas
   game/board.js      Board — selection chain, guesses, collapse/reveal
-  ui/menu.js         menu decorations, ambient FX, settings, power-off
-  ui/game.js         HUD (hearts/timer), win-lose modals, lifecycles
-  main.js            boot, cursors, monitor scaling, settings persistence
+  ui/logo.js         live text logo: per-letter animation, text swaps
+  ui/menu.js         menu props (random per visit), ambient FX, settings
+  ui/game.js         HUD (hearts/timer), logo remarks, win-lose modals
+  main.js            boot, cursors, settings persistence
 ```
 
 ### Extending it
@@ -61,6 +63,9 @@ js/
   `VT.screens.register(name, {el, onEnter, onExit})`, go with
   `VT.screens.go(name)`.
 
-Assets: `assets/img/logo.png` (title logo), `assets/fonts/` (Press Start 2P,
-Cyrillic + Latin subsets, loaded locally). Reference art lives in the repo
-root. Settings (sound / CRT / particles) persist in `localStorage`.
+Assets: `sprites/` (PNG pixel props for the menu — cup, lightbulb,
+magnifying glass, books, speech bubble), `assets/fonts/` (Press Start 2P,
+Cyrillic + Latin subsets, loaded locally). The title logo is generated
+from font letters at runtime (`js/ui/logo.js`) — in-game it occasionally
+swaps to congrats/snarky remarks. Reference art lives in the repo root.
+Settings (sound / CRT / particles) persist in `localStorage`.

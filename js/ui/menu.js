@@ -22,7 +22,9 @@
     { src: 'sprites/books.png',           w: 104 },
     { src: 'sprites/speechbubble.png',    w: 78 },
   ];
-  /* anchor points (percent, element centered on them) */
+  /* anchor points (percent, element centered on them). On narrow
+     screens the buttons span nearly the full width, so the props
+     move beside the logo and into the free band below the buttons. */
   const SLOTS = [
     { x: 10, y: 36 },
     { x: 8,  y: 63 },
@@ -30,13 +32,20 @@
     { x: 88, y: 64 },
     { x: 82, y: 12 },
   ];
+  const SLOTS_NARROW = [
+    { x: 11, y: 7 },
+    { x: 88, y: 8 },
+    { x: 13, y: 76 },
+    { x: 50, y: 79 },
+    { x: 87, y: 76 },
+  ];
 
   /** Drop the props into randomly assigned slots — new layout
       every time the menu is entered. */
   function placeProps() {
     const side = document.getElementById('side-deco');
     side.querySelectorAll('.sd').forEach((s) => s.remove());
-    const slots = shuffle(SLOTS);
+    const slots = shuffle(window.innerWidth < 700 ? SLOTS_NARROW : SLOTS);
     PROPS.forEach((p, i) => {
       const s = slots[i];
       const d = el('span', 'sd');
@@ -237,6 +246,13 @@
       menuLogo = VT.logo.mount(document.getElementById('menu-logo'), 'В ТЕМУ!');
       decorate();
       bind();
+      /* rotation / resize can move the buttons under the props — re-place */
+      let placeT = null;
+      window.addEventListener('resize', () => {
+        if (VT.screens.current !== 'menu') return;
+        clearTimeout(placeT);
+        placeT = setTimeout(placeProps, 180);
+      });
       VT.screens.register('menu', {
         el: document.getElementById('view-menu'),
         onEnter() {
