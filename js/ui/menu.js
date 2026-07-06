@@ -13,14 +13,14 @@
   let emitters = [];
   let menuLogo = null;
 
-  /* PNG pixel-art props (sprites/ folder). The mug keeps its id so
+  /* PNG pixel-art props (assets/sprites/). The mug keeps its id so
      the steam emitter can find it wherever it lands. */
   const PROPS = [
-    { src: 'sprites/cup.png',             w: 92,  id: 'deco-mug' },
-    { src: 'sprites/lightbulb.png',       w: 88 },
-    { src: 'sprites/magnifyingglass.png', w: 94 },
-    { src: 'sprites/books.png',           w: 104 },
-    { src: 'sprites/speechbubble.png',    w: 78 },
+    { src: 'assets/sprites/cup.png',             w: 92,  id: 'deco-mug' },
+    { src: 'assets/sprites/lightbulb.png',       w: 88 },
+    { src: 'assets/sprites/magnifyingglass.png', w: 94 },
+    { src: 'assets/sprites/books.png',           w: 104 },
+    { src: 'assets/sprites/speechbubble.png',    w: 78 },
   ];
   /* anchor points (percent, element centered on them). On narrow
      screens the buttons span nearly the full width, so the props
@@ -135,21 +135,6 @@
 
   /* ---------------- modals ---------------- */
 
-  function comingSoon(title, icon) {
-    const body = el('div', '');
-    body.style.textAlign = 'center';
-    const mascot = VT.sprites.img('mascot', { scale: 6 });
-    mascot.style.marginBottom = '14px';
-    body.appendChild(mascot);
-    body.appendChild(el('div', '', '<span style="font-size:13px;color:var(--cream-dark)">РАЗДЕЛ В РАЗРАБОТКЕ</span>'));
-    body.appendChild(el('div', '', '<span style="font-size:10px;color:var(--dim);display:block;margin-top:10px">ЗАГЛЯНИ ПОЗЖЕ, ИГРОК 1</span>'));
-    VT.modal.open({
-      title, icon, sub: 'СИСТЕМА 128 СООБЩАЕТ',
-      body,
-      buttons: [{ label: 'ПОНЯТНО', primary: true }],
-    });
-  }
-
   function settingsModal() {
     const body = el('div', '');
     body.style.width = '100%';
@@ -199,6 +184,7 @@
     VT.audio.play('powerOn');
     off.classList.remove('off'); off.classList.add('on');
     setTimeout(() => off.classList.remove('on'), 750);
+    VT.profile.track('powerCycles');
     if (VT.screens.current === 'menu') {
       startAmbient();
       menuLogo && menuLogo.startTicker();
@@ -216,8 +202,8 @@
       VT.fx.burst(p.x - p.w / 2 + 20, p.y, { count: 6, speed: 80, size: [2, 4] });
       const act = btn.dataset.action;
       if (act === 'play') VT.screens.go('game');
-      else if (act === 'modes') comingSoon('РЕЖИМЫ', 'grid');
-      else if (act === 'profile') comingSoon('ПРОФИЛЬ', 'person');
+      else if (act === 'shop') VT.screens.go('shop');
+      else if (act === 'profile') VT.screens.go('profile');
       else if (act === 'settings') settingsModal();
       else if (act === 'exit') powerOff();
     });
@@ -238,6 +224,7 @@
       menuLogo.wave();
       VT.fx.burst(p.x, p.y, { count: 22, speed: 200 });
       for (let i = 0; i < 3; i++) VT.fx.heart(p.x + rand(-80, 80), p.y + rand(-20, 20), 3);
+      VT.profile.track('logoClicks');
     });
   }
 

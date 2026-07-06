@@ -81,6 +81,11 @@
     powerOff: () => { tone({ f0: 900, f1: 40, dur: 0.4, type: 'sawtooth', vol: 0.5 }); noiseBurst({ dur: 0.25, vol: 0.3 }); },
     static:   () => noiseBurst({ dur: 0.18, vol: 0.25 }),
     pulse:    () => tone({ f0: 1500, f1: 2400, dur: 0.05, vol: 0.12, type: 'sine' }),
+    coin:     () => { tone({ f0: 988, dur: 0.06, vol: 0.4 }); tone({ f0: 1319, dur: 0.16, vol: 0.4, delay: 0.06 }); },
+    buy:      () => { tone({ f0: 660, f1: 880, dur: 0.08, vol: 0.5 }); tone({ f0: 880, f1: 1175, dur: 0.12, vol: 0.4, delay: 0.08 }); noiseBurst({ dur: 0.06, vol: 0.12, delay: 0.02 }); },
+    denied:   () => { tone({ f0: 220, f1: 170, dur: 0.11, vol: 0.5 }); tone({ f0: 165, f1: 120, dur: 0.16, vol: 0.5, delay: 0.1 }); },
+    ach:      () => [0, 5, 9, 12, 17].forEach((s, i) => { tone({ f0: N(s), dur: 0.1, vol: 0.55, delay: i * 0.07 }); tone({ f0: N(s + 12), dur: 0.08, vol: 0.18, delay: i * 0.07 + 0.02 }); }),
+    level:    () => [0, 4, 7, 12, 16, 12, 19].forEach((s, i) => tone({ f0: N(s), dur: 0.11, vol: 0.55, delay: i * 0.08, type: 'triangle' })),
   };
 
   VT.audio = {

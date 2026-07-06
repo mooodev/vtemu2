@@ -263,10 +263,14 @@
   transition: transform .1s ease, box-shadow .1s ease, background .12s, color .12s;
   z-index: 2;
 }
-.tile span { pointer-events: none; transform: translateY(1px); white-space: nowrap; }
+.tile span {
+  pointer-events: none; transform: translateY(1px); white-space: nowrap;
+  /* faint emboss keeps labels legible under the CRT overlays */
+  text-shadow: 0 1px 0 rgba(255,255,255,.28);
+}
 
 /* word-length flavor: some tiles come out "bold", some "italic" */
-.tile.t-bold span { text-shadow: 1px 0 0 currentColor; letter-spacing: .5px; }
+.tile.t-bold span { text-shadow: 1px 0 0 currentColor, 0 1px 0 rgba(255,255,255,.28); letter-spacing: .5px; }
 .tile.t-italic span { transform: translateY(1px) skewX(-8deg); }
 
 @media (hover: hover) {
@@ -358,6 +362,7 @@
   margin-top: clamp(12px, 2.2vh, 22px);
   flex: 0 0 auto;
 }
+.ctrl-left { display: flex; align-items: center; gap: clamp(10px, 2.6vw, 18px); flex-wrap: wrap; }
 .hearts { display: flex; align-items: center; gap: 12px; font-size: clamp(9px, 2.2vw, 11px); color: var(--dim); }
 #hearts-row { display: inline-flex; gap: 7px; }
 #hearts-row .hp { display: inline-flex; transition: transform .2s; }
@@ -372,6 +377,7 @@
 
 @media (max-width: 640px) {
   .game-controls { justify-content: center; }
+  .ctrl-left { justify-content: center; }
   .ctrl-btns { justify-content: center; }
   .hearts-label { display: none; }
 }

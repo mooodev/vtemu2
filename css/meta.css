@@ -1,0 +1,434 @@
+/* ============================================================
+   В ТЕМУ! — meta.css
+   Profile & shop views, achievements, archive, XP bar,
+   coin chips, reward rows, the ПОБЕДА button, the paid
+   ОБЪЯСНИТЬ mode and the flying-coin toasts.
+   ============================================================ */
+
+/* ---- view headers ---- */
+
+.meta-title {
+  flex: 1 1 auto; min-width: 0;
+  text-align: center;
+  font-size: clamp(14px, 3.8vw, 22px); font-weight: 400; letter-spacing: 3px;
+  color: var(--cream);
+  text-shadow: 2px 2px 0 var(--ink), 4px 4px 0 rgba(0,0,0,.35);
+}
+
+.coin-chip { color: var(--gold-bright); gap: 8px; }
+.coin-chip img { display: block; }
+
+/* ---- scrollable content well ---- */
+
+.meta-body {
+  flex: 1 1 auto; min-height: 0;
+  width: 100%; max-width: 900px;
+  margin-top: clamp(8px, 1.6vh, 16px);
+  overflow-y: auto;
+  padding: 4px 6px 14px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--panel-3) transparent;
+}
+.meta-body::-webkit-scrollbar { width: 10px; }
+.meta-body::-webkit-scrollbar-track { background: transparent; }
+.meta-body::-webkit-scrollbar-thumb {
+  background: var(--panel-3);
+  border: 2px solid var(--ink); border-radius: 6px;
+}
+
+.tab-cap {
+  font-size: clamp(9px, 2.2vw, 11px); color: var(--dim);
+  letter-spacing: 1px; margin: 4px 2px 12px; text-align: center;
+}
+
+.meta-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+  padding: 40px 10px; text-align: center;
+  font-size: clamp(10px, 2.6vw, 12px); color: var(--dim); line-height: 1.8;
+}
+
+/* ============================================================
+   Player card
+   ============================================================ */
+
+.pcard {
+  display: flex; align-items: center; gap: clamp(14px, 3vw, 24px);
+  padding: clamp(12px, 2.6vw, 18px);
+  background: var(--panel-2);
+  border: 3px solid var(--ink); border-radius: 10px;
+  box-shadow: inset 0 0 0 1px rgba(170,200,110,.18), inset 0 3px 10px rgba(0,0,0,.45);
+}
+.pcard-col { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.pcard-name {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  font-size: clamp(12px, 3vw, 16px); color: var(--cream); letter-spacing: 1px;
+}
+.pcard-lvl {
+  font-size: clamp(9px, 2.2vw, 11px); color: var(--ink);
+  background: linear-gradient(var(--gold-bright), var(--gold));
+  border: 2px solid var(--ink); border-radius: 6px;
+  padding: 4px 8px 3px;
+  box-shadow: 0 2px 0 var(--ink);
+}
+.pcard-meta { display: flex; gap: clamp(12px, 3vw, 22px); flex-wrap: wrap; }
+.pcard-meta .pm {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: clamp(9px, 2.4vw, 11px); color: var(--cream-dark);
+}
+
+/* avatar frames (shared with shop) */
+.ava-frame {
+  position: relative; flex: 0 0 auto;
+  border: 3px solid var(--ink); border-radius: 8px;
+  background: #0d120a;
+  box-shadow: 0 3px 0 var(--ink), inset 0 0 0 2px rgba(170,200,110,.2);
+  overflow: hidden;
+  line-height: 0;
+}
+/* CSS-cropped cell of the avatar spritesheet (see core/avatars.js) */
+.ava-crop {
+  display: block; width: 100%; height: 100%;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+/* built-in mascot avatar: generated sprite centered on the panel */
+.ava-crop.ava-builtin {
+  background-color: #10150c;
+  background-size: 80% auto;
+  background-position: center;
+}
+.pcard-ava { width: clamp(72px, 16vw, 104px); height: clamp(72px, 16vw, 104px); cursor: pointer; transition: transform .12s; }
+.pcard-ava:hover { transform: scale(1.05); }
+
+/* XP bar */
+.xpbar {
+  position: relative; height: 20px;
+  border: 3px solid var(--ink); border-radius: 7px;
+  background: var(--panel);
+  box-shadow: inset 0 2px 5px rgba(0,0,0,.55);
+  overflow: hidden;
+}
+.xpbar .fill {
+  position: absolute; inset: 0; right: auto;
+  background: linear-gradient(#cbe98d, var(--green) 60%, #7da13e);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.4);
+  transition: width .6s cubic-bezier(.3, 1, .3, 1);
+}
+.xpbar .cap {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; letter-spacing: 1px; color: var(--cream);
+  text-shadow: 1px 1px 0 rgba(0,0,0,.7);
+}
+
+/* ============================================================
+   Tabs
+   ============================================================ */
+
+.ptabs {
+  display: flex; gap: clamp(6px, 1.6vw, 10px);
+  margin: clamp(12px, 2.4vh, 18px) 0 clamp(10px, 2vh, 14px);
+}
+.ptab {
+  flex: 1 1 0;
+  padding: clamp(9px, 2vw, 12px) 4px;
+  font-family: var(--px-font); font-size: clamp(8px, 2.2vw, 11px); letter-spacing: 1px;
+  color: var(--cream-dark);
+  background: var(--panel);
+  border: 3px solid var(--ink); border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgba(170,200,110,.12), 0 3px 0 var(--ink);
+  cursor: pointer;
+  transition: transform .08s, background .12s, color .12s;
+}
+.ptab.on {
+  color: var(--ink);
+  background: linear-gradient(#ddd0a2, var(--khaki) 55%, #c4b483);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.5), 0 3px 0 var(--ink);
+}
+@media (hover: hover) { .ptab:not(.on):hover { color: var(--cream); transform: translateY(-1px); } }
+
+/* ============================================================
+   Achievements
+   ============================================================ */
+
+.ach-grid {
+  display: grid; gap: clamp(8px, 1.6vw, 12px);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+}
+.ach-card {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: clamp(10px, 2vw, 14px);
+  background: var(--panel);
+  border: 3px solid var(--ink); border-radius: 9px;
+  box-shadow: inset 0 0 0 1px rgba(170,200,110,.12), 0 3px 0 rgba(0,0,0,.4);
+}
+.ach-card .ico {
+  flex: 0 0 auto; width: 46px; height: 46px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--panel-3);
+  border: 2px solid var(--ink); border-radius: 7px;
+}
+.ach-card.unlocked .ico {
+  background: linear-gradient(#f6d87c, var(--gold) 65%, #b8860b);
+  box-shadow: 0 0 14px rgba(233,184,64,.35), inset 0 2px 0 rgba(255,255,255,.45);
+}
+.ach-card.locked { filter: saturate(.35); opacity: .75; }
+.ach-card .ico .q { font-size: 20px; color: var(--dim); }
+.ach-card .col { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.ach-card .t { font-size: clamp(9px, 2.4vw, 11px); color: var(--cream); letter-spacing: 1px; }
+.ach-card .d { font-size: clamp(7px, 2vw, 9px); color: var(--dim); line-height: 1.7; }
+.ach-card .when { font-size: 7px; color: var(--green-text); }
+.ach-card .rw {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 8px; color: var(--gold-bright);
+}
+.ach-prog {
+  height: 8px; border: 2px solid var(--ink); border-radius: 4px;
+  background: var(--panel-2); overflow: hidden;
+}
+.ach-prog i {
+  display: block; height: 100%;
+  background: linear-gradient(var(--green-bright), var(--green));
+}
+.ach-card .pnum { font-size: 7px; color: var(--dim); }
+
+/* ============================================================
+   Archive
+   ============================================================ */
+
+.arch-list { display: flex; flex-direction: column; gap: clamp(6px, 1.4vw, 10px); }
+.arch-row {
+  display: flex; align-items: center; gap: clamp(10px, 2.4vw, 16px);
+  width: 100%; text-align: left;
+  padding: clamp(9px, 2vw, 13px) clamp(10px, 2.4vw, 16px);
+  font-family: var(--px-font);
+  background: var(--panel);
+  border: 3px solid var(--ink); border-radius: 9px;
+  box-shadow: inset 0 0 0 1px rgba(170,200,110,.12), 0 3px 0 rgba(0,0,0,.4);
+  cursor: pointer;
+  transition: transform .08s, background .12s;
+}
+@media (hover: hover) { .arch-row:hover { background: var(--panel-2); transform: translateY(-1px); } }
+.arch-row .ico { flex: 0 0 auto; display: inline-flex; }
+.arch-row.l .ico { filter: saturate(.5); }
+.arch-row .col { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.arch-row .col b { font-size: clamp(8px, 2.2vw, 10px); font-weight: 400; color: var(--cream); letter-spacing: 1px; }
+.arch-row.l .col b { color: var(--cream-dark); }
+.arch-row .col i { font-size: 7px; font-style: normal; color: var(--dim); }
+.arch-row .st {
+  flex: 0 0 auto; display: flex; flex-direction: column; gap: 6px; align-items: flex-end;
+  font-size: clamp(7px, 1.8vw, 9px); color: var(--green-text);
+}
+.arch-row.l .st { color: var(--red-bright); }
+
+/* ============================================================
+   Stats tab
+   ============================================================ */
+
+.stat-grid {
+  display: grid; gap: clamp(8px, 1.6vw, 12px);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
+}
+.stat-tile {
+  display: flex; flex-direction: column; align-items: center; gap: 9px;
+  padding: clamp(12px, 2.4vw, 18px) 8px;
+  background: var(--panel);
+  border: 3px solid var(--ink); border-radius: 9px;
+  box-shadow: inset 0 0 0 1px rgba(170,200,110,.12), 0 3px 0 rgba(0,0,0,.4);
+  text-align: center;
+}
+.stat-tile b {
+  font-size: clamp(14px, 3.6vw, 19px); font-weight: 400; color: var(--gold);
+  text-shadow: 2px 2px 0 rgba(0,0,0,.5);
+}
+.stat-tile span { font-size: clamp(7px, 1.8vw, 8px); color: var(--dim); letter-spacing: 1px; line-height: 1.6; }
+
+/* ============================================================
+   Shop
+   ============================================================ */
+
+.shop-grid {
+  display: grid; gap: clamp(8px, 1.8vw, 14px);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 136px), 1fr));
+}
+.ava-card {
+  display: flex; flex-direction: column; align-items: center; gap: 9px;
+  padding: clamp(10px, 2vw, 14px) 8px;
+  background: var(--panel);
+  border: 3px solid var(--ink); border-radius: 10px;
+  box-shadow: inset 0 0 0 1px rgba(170,200,110,.12), 0 3px 0 rgba(0,0,0,.4);
+  transition: transform .1s;
+}
+@media (hover: hover) { .ava-card:hover { transform: translateY(-2px); } }
+.ava-card .ava-frame { width: clamp(64px, 20vw, 96px); height: clamp(64px, 20vw, 96px); }
+.ava-card.equipped {
+  border-color: var(--green-deep);
+  box-shadow: inset 0 0 0 1px rgba(170,200,110,.3), 0 3px 0 rgba(0,0,0,.4), 0 0 18px rgba(157,193,87,.35);
+}
+.ava-card .ava-name {
+  font-size: clamp(7px, 1.8vw, 9px); color: var(--cream-dark); letter-spacing: 1px;
+  text-align: center;
+}
+.ava-card.equipped .ava-name { color: var(--green-bright); }
+.ava-tag {
+  position: absolute; top: 3px; right: 3px;
+  font-size: 7px; color: var(--ink);
+  background: var(--green-bright);
+  border: 2px solid var(--ink); border-radius: 4px;
+  padding: 2px 4px 1px;
+}
+.ava-btn { height: 34px; padding: 0 12px; font-size: clamp(8px, 2vw, 10px); gap: 6px; }
+.ava-btn.price.too-rich { filter: saturate(.5) brightness(.8); }
+.ava-card.just-bought { animation: bought-pop .55s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes bought-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.1) rotate(-2deg); filter: brightness(1.5); }
+  100% { transform: scale(1); filter: none; }
+}
+
+.buy-body { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.buy-body .ava-frame.big { width: 128px; height: 128px; }
+.buy-price {
+  display: flex; align-items: center; gap: 10px;
+  font-size: clamp(10px, 2.6vw, 13px); color: var(--cream-dark);
+}
+.buy-price b { color: var(--gold-bright); font-weight: 400; font-size: clamp(13px, 3.2vw, 17px); }
+.buy-warn { font-size: clamp(8px, 2vw, 10px); color: var(--red-bright); text-align: center; line-height: 1.7; }
+
+/* ============================================================
+   Rewards & win flow
+   ============================================================ */
+
+.reward-row {
+  display: flex; align-items: center; justify-content: center; gap: clamp(14px, 3.4vw, 24px);
+  margin-top: 16px; padding: clamp(10px, 2.2vw, 14px);
+  background: var(--panel);
+  border: 2px dashed #46502e; border-radius: 8px;
+}
+.reward-row .rw-cap { font-size: clamp(8px, 2vw, 10px); color: var(--dim); letter-spacing: 1px; }
+.reward-row .rw {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: clamp(10px, 2.6vw, 13px);
+}
+.reward-row .rw b { color: var(--gold-bright); font-weight: 400; text-shadow: 2px 2px 0 rgba(0,0,0,.5); }
+
+/* the bouncing gold ПОБЕДА button (3 classes: must outrank
+   the .cbtn.primary:not(:disabled) ready-pulse) */
+.cbtn.primary.victory {
+  background: linear-gradient(#ffedad, var(--gold) 55%, #c08d2a);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.6),
+    inset 0 -3px 0 rgba(120,85,20,.5),
+    0 4px 0 var(--ink),
+    0 0 26px rgba(233,184,64,.45);
+  animation: victory-bounce 1.15s ease-in-out infinite;
+}
+@keyframes victory-bounce {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  18% { transform: translateY(-5px) rotate(-2deg) scale(1.05); }
+  36% { transform: translateY(0) rotate(1.6deg) scale(1); }
+  50% { transform: translateY(-2px) rotate(-.8deg); }
+  64% { transform: translateY(0) rotate(0); }
+}
+@media (hover: hover) {
+  .cbtn.primary.victory:hover { background: linear-gradient(#fff3c4, #f2c452 55%, #cf9a30); }
+}
+
+/* ============================================================
+   Paid ОБЪЯСНИТЬ
+   ============================================================ */
+
+.cbtn.gold { background: linear-gradient(#f2e3ae, #e3cd8a 55%, #c9ab60); }
+.cbtn.gold:disabled {
+  background: linear-gradient(#5a5f4a, #4a4f3c);
+  color: #8b8e77;
+}
+.cbtn.gold:disabled .cost { color: #8b8e77; }
+@media (hover: hover) {
+  .cbtn.gold:hover { background: linear-gradient(#f9ecbd, #ecd694 55%, #d3b56a); }
+}
+.cbtn .cost {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 9px; color: var(--gold-bright);
+  background: rgba(20, 16, 8, .82);
+  border: 2px solid var(--ink); border-radius: 5px;
+  padding: 3px 6px 2px;
+}
+.cbtn.gold.armed {
+  background: linear-gradient(#f6d87c, var(--gold) 55%, #b8860b);
+  animation: explain-pulse .9s ease-in-out infinite;
+}
+@keyframes explain-pulse {
+  0%, 100% { box-shadow: inset 0 2px 0 rgba(255,255,255,.5), inset 0 -3px 0 rgba(90,75,40,.5), 0 4px 0 var(--ink); }
+  50% { box-shadow: inset 0 2px 0 rgba(255,255,255,.5), inset 0 -3px 0 rgba(90,75,40,.5), 0 4px 0 var(--ink), 0 0 22px rgba(233,184,64,.6); }
+}
+.cbtn.shake-no { animation: shake-no .4s steps(8) both; }
+@keyframes shake-no {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-3px); }
+}
+
+/* tiles invite a poke while explain mode is armed */
+#view-game.explaining .tile {
+  animation: tile-invite 1.1s ease-in-out infinite;
+}
+@keyframes tile-invite {
+  0%, 100% { box-shadow: inset 0 3px 0 rgba(255,255,255,.5), inset 0 -4px 0 rgba(90,75,40,.45), 0 4px 0 var(--ink); }
+  50% { box-shadow: inset 0 3px 0 rgba(255,255,255,.5), inset 0 -4px 0 rgba(90,75,40,.45), 0 4px 0 var(--ink), 0 0 18px rgba(233,184,64,.5); }
+}
+
+.lore-body { display: flex; align-items: flex-start; gap: 18px; }
+.lore-text {
+  flex: 1 1 auto; min-width: 0;
+  font-size: clamp(9px, 2.4vw, 11px); line-height: 2;
+  color: var(--cream-dark);
+}
+@media (max-width: 520px) {
+  .lore-body { flex-direction: column; align-items: center; text-align: center; }
+  #btn-explain .lbl { display: none; }
+}
+
+/* ============================================================
+   HUD extras
+   ============================================================ */
+
+.sb-ava {
+  display: inline-flex; flex: 0 0 auto;
+  width: 46px; height: 46px;
+  border: 3px solid var(--ink); border-radius: 7px;
+  background: #0d120a;
+  box-shadow: 0 2px 0 var(--ink);
+  overflow: hidden; line-height: 0;
+}
+
+/* achievement / level-up toast */
+.toast.ach {
+  display: flex; align-items: center; gap: 14px;
+  background: linear-gradient(#3a4028, var(--panel-2));
+  color: var(--cream);
+  border-color: var(--gold);
+  box-shadow: 0 4px 0 var(--ink), 0 0 30px rgba(233,184,64,.35), 0 10px 24px rgba(0,0,0,.5);
+  animation: ach-in .4s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes ach-in { from { transform: translateY(-24px) scale(.7); opacity: 0; } }
+.toast.ach .ach-t-ico {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; flex: 0 0 auto;
+  background: linear-gradient(#f6d87c, var(--gold) 65%, #b8860b);
+  border: 2px solid var(--ink); border-radius: 7px;
+}
+.toast.ach .ach-t-col { display: inline-flex; flex-direction: column; gap: 5px; }
+.toast.ach .ach-t-col b { font-size: 9px; font-weight: 400; color: var(--gold-bright); letter-spacing: 1px; }
+.toast.ach .ach-t-col i { font-size: 11px; font-style: normal; color: var(--cream); }
+.toast.ach .ach-t-col em {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 8px; font-style: normal; color: var(--gold-bright);
+}
+
+/* narrow phones: keep the meta headers tidy */
+@media (max-width: 470px) {
+  .coin-chip { height: 36px; padding: 0 9px; font-size: 10px; }
+  .meta-title { letter-spacing: 1px; }
+}

@@ -22,6 +22,16 @@
   let running = false;
   let lastT = 0;
 
+  /* PNG coins (assets/sprites/) used by the coin-fly animation */
+  const coinImgs = [];
+  function loadCoins() {
+    ['assets/sprites/coin2.png', 'assets/sprites/coin1.png'].forEach((src, i) => {
+      const im = new Image();
+      im.src = src;
+      coinImgs[i] = im;
+    });
+  }
+
   function resize() {
     const screen = document.getElementById('screen');
     canvas.width = screen.offsetWidth;
@@ -59,6 +69,28 @@
       ctx.fillRect(p.x - (s * flip) / 2, p.y - s / 2, Math.max(1, s * flip), s);
     },
 
+    /* PNG coin riding a quadratic bezier into its target, spinning.
+       easeIn on the path = lazy pop out, then vacuumed to the counter */
+    coin(p, dt) {
+      p.age += dt;
+      const t = Math.min(1, p.age / p.life);
+      const q = t * t;
+      const iq = 1 - q;
+      p.x = iq * iq * p.sx + 2 * iq * q * p.cx + q * q * p.tx;
+      p.y = iq * iq * p.sy + 2 * iq * q * p.cy + q * q * p.ty;
+      const img = coinImgs[p.img];
+      const flip = Math.cos(p.age * p.spin + p.seed);
+      const w = Math.max(2, p.size * Math.abs(flip));
+      if (img && img.complete && img.naturalWidth) {
+        const h = p.size * (img.naturalHeight / img.naturalWidth);
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(img, p.x - w / 2, p.y - h / 2, w, h);
+      } else {
+        ctx.fillStyle = '#e9b840';
+        ctx.fillRect(p.x - w / 2, p.y - p.size / 2, w, p.size);
+      }
+    },
+
     /* sprite that floats upward, swaying (hearts, steam) */
     floaty(p, dt) {
       p.age += dt;
@@ -89,9 +121,14 @@
         em.acc = (em.acc || 0) + dt * em.rate;
         while (em.acc >= 1) { em.acc -= 1; em.make(); }
       }
-      parts = parts.filter((p) => p.age < p.life);
+      parts = parts.filter((p) => {
+        if (p.age < p.life) return true;
+        p.done && p.done();
+        return false;
+      });
       for (const p of parts) BEHAVIOURS[p.type](p, dt);
     } else {
+      for (const p of parts) p.done && p.done();
       parts = [];
     }
     requestAnimationFrame(frame);
@@ -103,6 +140,7 @@
     init() {
       canvas = document.getElementById('fx-canvas');
       ctx = canvas.getContext('2d');
+      loadCoins();
       resize();
       window.addEventListener('resize', resize);
       running = true;
@@ -151,6 +189,34 @@
       emitters.push(em);
       setTimeout(() => fx.removeEmitter(em), dur * 1000);
       return em;
+    },
+
+    /**
+     * Flock of PNG coins flying from `from` to `to` (screen coords).
+     * Staggered take-off, scattered bezier arcs, spin, per-coin
+     * `onArrive(i)` — used for the earn/spend money moments.
+     */
+    coinFly({ from, to, count = 8, size = 26, stagger = 55, onArrive } = {}) {
+      if (!enabled) { for (let i = 0; i < count; i++) onArrive && onArrive(i); return; }
+      for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+          const sx = from.x + rand(-8, 8), sy = from.y + rand(-6, 6);
+          parts.push({
+            type: 'coin',
+            x: sx, y: sy, sx, sy,
+            cx: sx + rand(-110, 110), cy: sy - rand(30, 130),
+            tx: to.x + rand(-4, 4), ty: to.y + rand(-3, 3),
+            age: 0, life: rand(0.55, 0.85),
+            size: size * rand(0.8, 1.1),
+            spin: rand(9, 15), seed: rand(10),
+            img: Math.random() < 0.22 ? 1 : 0,
+            done: () => {
+              fx.sparkle(to.x, to.y, { size: 5, color: '#f6d87c' });
+              onArrive && onArrive(i);
+            },
+          });
+        }, i * stagger);
+      }
     },
 
     heart(x, y, scale = 2) {

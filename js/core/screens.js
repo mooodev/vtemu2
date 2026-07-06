@@ -114,44 +114,5 @@
     },
   };
 
-  /* ---------------- shared status bar ---------------- */
-
-  VT.buildStatusBars = () => {
-    document.querySelectorAll('[data-statusbar]').forEach((bar) => {
-      bar.innerHTML = '';
-
-      const player = el('div', 'sb-cell sb-player');
-      player.appendChild(VT.sprites.img('mascot', { scale: 3 }));
-      const col = el('div', 'sb-col');
-      const row1 = el('div', 'sb-row', '<span>ИГРОК 1</span>');
-      const pips = el('span', 'sb-pips');
-      for (let i = 0; i < 7; i++) pips.appendChild(el('i', i < 5 ? '' : 'dim'));
-      row1.appendChild(pips);
-      const row2 = el('div', 'sb-row');
-      row2.appendChild(VT.sprites.img('star', { scale: 2 }));
-      row2.appendChild(el('span', '', '23'));
-      row2.appendChild(VT.sprites.img('coin', { scale: 2 }));
-      row2.appendChild(el('span', '', '1250'));
-      row2.appendChild(VT.sprites.img('trophy', { scale: 2 }));
-      row2.appendChild(el('span', '', '015'));
-      col.appendChild(row1); col.appendChild(row2);
-      player.appendChild(col);
-
-      const level = el('div', 'sb-cell sb-level');
-      level.appendChild(el('span', 'sb-cap', '-- УРОВЕНЬ --'));
-      level.appendChild(el('span', 'sb-num', '01'));
-
-      const sys = el('div', 'sb-cell sb-sys');
-      const sysCol = el('div', 'sb-col');
-      sysCol.appendChild(el('span', '', '<b>СИСТЕМА 128</b>'));
-      sysCol.appendChild(el('span', '', 'ВЕР. 1.90'));
-      sysCol.appendChild(el('span', '', '© 1990'));
-      sys.appendChild(sysCol);
-      sys.appendChild(VT.sprites.img('flagRu', { scale: 3 }));
-
-      bar.appendChild(player);
-      bar.appendChild(level);
-      bar.appendChild(sys);
-    });
-  };
+  /* status bars moved to ui/hud.js — they render live profile data now */
 })();

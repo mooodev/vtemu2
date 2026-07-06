@@ -4,11 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>В ТЕМУ! — СИСТЕМА 128</title>
+<link rel="icon" type="image/png" href="assets/img/logo.png">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/ui.css">
 <link rel="stylesheet" href="css/screens.css">
+<link rel="stylesheet" href="css/meta.css">
 </head>
-<body>
+<!-- boots dark: the tube powers on via JS, so no UI leaks before the effect -->
+<body class="tv-dead boot">
 <div id="screen">
   <!-- ============ MENU ============ -->
   <section class="view" id="view-menu">
@@ -23,8 +26,8 @@
     </div>
     <nav class="menu-buttons" id="menu-buttons">
       <button class="mbtn primary" data-action="play"><span class="mbtn-ico" data-ico="play"></span><span class="mbtn-label">ИГРАТЬ</span></button>
-      <button class="mbtn" data-action="modes"><span class="mbtn-ico" data-ico="grid"></span><span class="mbtn-label">РЕЖИМЫ</span></button>
       <button class="mbtn" data-action="profile"><span class="mbtn-ico" data-ico="person"></span><span class="mbtn-label">ПРОФИЛЬ</span></button>
+      <button class="mbtn" data-action="shop"><span class="mbtn-ico" data-ico="cart"></span><span class="mbtn-label">МАГАЗИН</span></button>
       <button class="mbtn" data-action="settings"><span class="mbtn-ico" data-ico="gear"></span><span class="mbtn-label">НАСТРОЙКИ</span></button>
       <button class="mbtn" data-action="exit"><span class="mbtn-ico" data-ico="exit"></span><span class="mbtn-label">ВЫХОД</span></button>
     </nav>
@@ -47,14 +50,40 @@
         <canvas id="wires"></canvas>
       </div>
       <div class="game-controls">
-        <div class="hearts" id="hearts"><span class="hearts-label">ПОПЫТКИ</span><span id="hearts-row"></span></div>
+        <div class="ctrl-left">
+          <div class="hearts" id="hearts"><span class="hearts-label">ПОПЫТКИ</span><span id="hearts-row"></span></div>
+          <button class="cbtn gold" id="btn-explain" title="Объяснить слово (платно)"><span data-ico="bulb"></span><span class="lbl">ОБЪЯСНИТЬ</span><span class="cost" id="explain-cost"></span></button>
+        </div>
         <div class="ctrl-btns">
           <button class="cbtn" id="btn-shuffle"><span data-ico="shuffle"></span>МЕШАТЬ</button>
           <button class="cbtn" id="btn-clear"><span data-ico="cross"></span>СБРОС</button>
-          <button class="cbtn primary" id="btn-submit" disabled><span data-ico="check"></span>ПРОВЕРИТЬ</button>
+          <button class="cbtn primary" id="btn-submit" disabled><span data-ico="check"></span><span class="lbl">ПРОВЕРИТЬ</span></button>
         </div>
       </div>
     </div>
+    <footer class="status-bar" data-statusbar></footer>
+  </section>
+
+  <!-- ============ PROFILE ============ -->
+  <section class="view" id="view-profile" hidden>
+    <header class="game-header">
+      <button class="icon-btn" id="btn-profile-back" title="В меню"><span data-ico="back"></span></button>
+      <h2 class="meta-title">ПРОФИЛЬ</h2>
+      <div class="chip coin-chip" data-coinchip></div>
+    </header>
+    <div class="meta-body" id="profile-body"></div>
+    <footer class="status-bar" data-statusbar></footer>
+  </section>
+
+  <!-- ============ SHOP ============ -->
+  <section class="view" id="view-shop" hidden>
+    <header class="game-header">
+      <button class="icon-btn" id="btn-shop-back" title="В меню"><span data-ico="back"></span></button>
+      <h2 class="meta-title">МАГАЗИН</h2>
+      <div class="chip coin-chip" data-coinchip></div>
+    </header>
+    <p class="game-hint" id="shop-hint">АВАТАРЫ — КУПИ И НОСИ С ГОРДОСТЬЮ</p>
+    <div class="meta-body" id="shop-body"></div>
     <footer class="status-bar" data-statusbar></footer>
   </section>
 
@@ -75,12 +104,17 @@
 <script src="js/core/audio.js"></script>
 <script src="js/core/particles.js"></script>
 <script src="js/core/screens.js"></script>
+<script src="js/core/avatars.js"></script>
+<script src="js/core/profile.js"></script>
+<script src="js/ui/hud.js"></script>
 <script src="js/game/data.js"></script>
 <script src="js/game/wires.js"></script>
 <script src="js/game/board.js"></script>
 <script src="js/ui/logo.js"></script>
 <script src="js/ui/menu.js"></script>
 <script src="js/ui/game.js"></script>
+<script src="js/ui/shop.js"></script>
+<script src="js/ui/profileView.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

@@ -46,29 +46,32 @@
 
   function boot() {
     VT.settings.load();
+    VT.profile.load();
     VT.fx.init();
     installCursors();
-    VT.buildStatusBars();
+    VT.hud.build();
 
     document.getElementById('tv-static').style.backgroundImage =
       `url(${VT.sprites.noiseTile(140)})`;
 
     VT.menuScreen.init();
     VT.gameScreen.init();
+    VT.shopScreen.init();
+    VT.profileScreen.init();
 
     /* audio requires a user gesture — unlock on first input */
     const unlock = () => { VT.audio.unlock(); document.removeEventListener('pointerdown', unlock); };
     document.addEventListener('pointerdown', unlock);
 
-    /* CRT power-on sequence.
+    /* CRT power-on sequence. The body starts as `tv-dead boot` straight
+       from the HTML, so nothing is visible until the tube fires up.
        Dev shortcuts: index.html#game boots into the game,
        #demo also pre-selects three tiles (for screenshots). */
     const route = location.hash.replace('#', '');
-    document.body.classList.add('tv-dead');
     const off = document.getElementById('tv-off');
     off.style.opacity = '1';
     setTimeout(() => {
-      document.body.classList.remove('tv-dead');
+      document.body.classList.remove('tv-dead', 'boot');
       off.style.opacity = '';
       off.classList.add('on');
       VT.audio.play('powerOn');

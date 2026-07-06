@@ -35,6 +35,7 @@
       this.on = on || (() => {});
 
       this.selection = [];   // tile elements, in selection order
+      this.pickHandler = null; // when set, intercepts tile taps (ОБЪЯСНИТЬ mode)
       this.solvedCount = 0;
       this.mistakes = 0;
       this.history = new Set();
@@ -81,6 +82,7 @@
 
     toggle(tile) {
       if (this.locked) return;
+      if (this.pickHandler && this.pickHandler(tile)) return;
       const idx = this.selection.indexOf(tile);
       if (idx >= 0) {
         this.selection.splice(idx, 1);
@@ -126,6 +128,7 @@
       if (this.history.has(key)) {
         VT.toast('УЖЕ ПРОБОВАЛИ!', '', 1300);
         VT.audio.play('almost');
+        this.on('dejavu');
         return;
       }
       this.history.add(key);

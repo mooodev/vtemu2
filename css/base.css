@@ -99,19 +99,31 @@ button, .tile, .mbtn, .cbtn, .ptoggle { touch-action: manipulation; }
    CRT overlays
    ============================================================ */
 
+/* kept deliberately faint — dark lines over the khaki tiles murder
+   readability, so the tube look comes mostly from vignette + glass */
 #scanlines {
   position: absolute; inset: 0; z-index: 40; pointer-events: none;
   background:
     repeating-linear-gradient(0deg,
-      rgba(0,0,0,.22) 0px, rgba(0,0,0,.22) 1px,
+      rgba(0,0,0,.10) 0px, rgba(0,0,0,.10) 1px,
       transparent 1px, transparent 4px),
     repeating-linear-gradient(90deg,
-      rgba(255,0,60,.025) 0px, rgba(255,0,60,.025) 1px,
-      rgba(0,255,120,.02) 1px, rgba(0,255,120,.02) 2px,
-      rgba(60,80,255,.025) 2px, rgba(60,80,255,.025) 3px);
+      rgba(255,0,60,.012) 0px, rgba(255,0,60,.012) 1px,
+      rgba(0,255,120,.010) 1px, rgba(0,255,120,.010) 2px,
+      rgba(60,80,255,.012) 2px, rgba(60,80,255,.012) 3px);
   animation: crt-flicker 4s steps(60) infinite;
 }
 body.no-crt #scanlines, body.no-crt #vignette, body.no-crt #glass { display: none; }
+
+/* small screens: even lighter lines, no RGB mask, no flicker repaints */
+@media (max-width: 700px), (pointer: coarse) {
+  #scanlines {
+    background: repeating-linear-gradient(0deg,
+      rgba(0,0,0,.06) 0px, rgba(0,0,0,.06) 1px,
+      transparent 1px, transparent 5px);
+    animation: none;
+  }
+}
 
 @keyframes crt-flicker {
   0%,100% { opacity: 1; } 50% { opacity: .93; }
@@ -131,9 +143,10 @@ body.no-crt #scanlines, body.no-crt #vignette, body.no-crt #glass { display: non
     rgba(220,255,220,.045) 52%, transparent 64%);
 }
 
-/* particle canvas sits above the views, below the scanlines */
+/* particle canvas sits above views AND modals (confetti / flying coins
+   must sail over the veil), below the scanlines */
 #fx-canvas {
-  position: absolute; inset: 0; z-index: 30; pointer-events: none;
+  position: absolute; inset: 0; z-index: 39; pointer-events: none;
   width: 100%; height: 100%;
 }
 
@@ -188,6 +201,8 @@ body.tv-dead #toast-root, body.tv-dead #modal-root { visibility: hidden; }
 }
 body.tv-dead #wake-hint { pointer-events: auto; cursor: pointer; }
 body.tv-dead #wake-hint span { animation: wake-blink 2.1s ease-in-out 1s infinite; }
+/* while booting the tube is dark but it's NOT the sleep state */
+body.boot #wake-hint { display: none; }
 @keyframes wake-blink { 0%,100% { opacity: .2; } 50% { opacity: .85; } }
 
 /* glitch slices on outgoing view during a screen switch */

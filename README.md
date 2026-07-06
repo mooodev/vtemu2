@@ -13,8 +13,22 @@ works on phones (portrait and landscape).
 - Click/tap tiles to link them into a chain (max 4). Click again to unlink.
 - `ПРОВЕРИТЬ` / **Enter** — submit the chain.
 - `МЕШАТЬ` / **S** — shuffle tiles. `СБРОС` / **Esc** — clear selection.
+- `ОБЪЯСНИТЬ` (costs 10 coins) — arm it, tap any word, get a mock-wiki
+  humorous definition (`lore` in `js/game/data.js`).
 - 4 mistakes = defeat. ВЫХОД in the menu actually powers the CRT down —
   tap the dead screen to turn it back on.
+- Solving all 4 groups turns ПРОВЕРИТЬ into a bouncing gold **ПОБЕДА**
+  button — review your groups, then press it to collect coins/XP.
+
+## Meta-game
+
+Persistent profile (`localStorage`, `js/core/profile.js`): coins, XP +
+levels, ~30 achievements (some secret, some with progress bars), archive
+of finished rounds, day streaks. ПРОФИЛЬ view shows it all; МАГАЗИН sells
+avatars CSS-cropped from `assets/img/avatars.png` (5×4 sheet — to add
+more, extend `META` + bump `ROWS` in `js/core/avatars.js`). Status bars
+and coin chips are live (`js/ui/hud.js`), earnings/purchases fly PNG
+coins (`assets/sprites/coin1.png`, `coin2.png`) to and from the counter.
 
 ## Dev routes (URL hash)
 
@@ -35,18 +49,24 @@ css/
   base.css        tokens, font-face, fullscreen tube, overlays, power fx
   ui.css          buttons, chips, status bar, toasts, modals, toggles
   screens.css     text logo, menu + game layouts, tiles, banners, badges
+  meta.css        profile & shop views, achievements, XP bar, coin FX
 js/
   core/util.js       helpers: rand/easing/DOM, FLIP, fitText
   core/sprites.js    pixel-art factory — sprites are text grids → canvas
   core/audio.js      chiptune SFX from raw WebAudio oscillators
-  core/particles.js  sparkles / hearts / confetti / steam + emitters
+  core/particles.js  sparkles / hearts / confetti / steam / coin flights
   core/screens.js    view manager + static transition, toasts, modals
-  game/data.js       puzzle definitions
+  core/avatars.js    avatar sheet CSS-cropper + names/prices
+  core/profile.js    persistent player: coins, XP, achievements, archive
+  ui/hud.js          live status bars, coin chips, celebration queue
+  game/data.js       puzzle definitions + humorous word lore
   game/wires.js      WireLayer — animated pixel connections canvas
   game/board.js      Board — selection chain, guesses, collapse/reveal
   ui/logo.js         live text logo: per-letter animation, text swaps
   ui/menu.js         menu props (random per visit), ambient FX, settings
-  ui/game.js         HUD (hearts/timer), logo remarks, win-lose modals
+  ui/game.js         HUD, ПОБЕДА flow, ОБЪЯСНИТЬ mode, win-lose modals
+  ui/shop.js         МАГАЗИН — buy & equip avatars
+  ui/profileView.js  ПРОФИЛЬ — achievements / archive / stats tabs
   main.js            boot, cursors, settings persistence
 ```
 
@@ -63,9 +83,13 @@ js/
   `VT.screens.register(name, {el, onEnter, onExit})`, go with
   `VT.screens.go(name)`.
 
-Assets: `sprites/` (PNG pixel props for the menu — cup, lightbulb,
-magnifying glass, books, speech bubble), `assets/fonts/` (Press Start 2P,
-Cyrillic + Latin subsets, loaded locally). The title logo is generated
-from font letters at runtime (`js/ui/logo.js`) — in-game it occasionally
-swaps to congrats/snarky remarks. Reference art lives in the repo root.
-Settings (sound / CRT / particles) persist in `localStorage`.
+Assets live under `assets/` only: `assets/sprites/` (PNG pixel props for
+the menu + the two flying coins), `assets/img/` (avatar sheet, logo),
+`assets/fonts/` (Press Start 2P, Cyrillic + Latin subsets, loaded
+locally). The title logo is generated from font letters at runtime
+(`js/ui/logo.js`) — in-game it occasionally swaps to congrats/snarky
+remarks. Settings (sound / CRT / particles) persist in `localStorage`.
+
+**For AI agents / contributors:** `CLAUDE.md` has the edit-here-for-X
+file map, the `VT.*` API cheat sheet, dev routes and gotchas — start
+there instead of reading the sources.
