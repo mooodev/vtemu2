@@ -51,6 +51,11 @@
     { id: 'tvoff',      icon: 'exit',      name: 'ВЫКЛ/ВКЛ',        desc: 'Выключи телевизор... и включи обратно', reward: 15, secret: true, cond: (s) => s.powerCycles >= 1 },
     { id: 'lvl5',       icon: 'star',      name: 'ПЯТЁРКА',         desc: 'Достигни 5 уровня', reward: 100, cond: (s, p) => p.level >= 5 },
     { id: 'lvl10',      icon: 'trophy',    name: 'ДЕСЯТКА',         desc: 'Достигни 10 уровня', reward: 250, cond: (s, p) => p.level >= 10 },
+    { id: 'daily1',     icon: 'clock',     name: 'В ЭФИРЕ',         desc: 'Реши официальный пазл дня', reward: 40, cond: (s) => s.dailyWins >= 1 },
+    { id: 'daily10',    icon: 'clock',     name: 'ПОСТОЯННЫЙ ЗРИТЕЛЬ', desc: 'Реши 10 пазлов дня', reward: 150, cond: (s) => s.dailyWins >= 10, prog: (s) => [s.dailyWins, 10] },
+    { id: 'weekly1',    icon: 'trophy',    name: 'УКРОТИТЕЛЬ',      desc: 'Реши «нерешаемый» пазл недели', reward: 300, cond: (s) => s.weeklyWins >= 1 },
+    { id: 'share1',     icon: 'star',      name: 'ГЛАШАТАЙ',        desc: 'Поделись результатом с друзьями', reward: 25, cond: (s) => s.shares >= 1 },
+    { id: 'digger',     icon: 'lock',      name: 'АРХИВАРИУС',      desc: 'Выкупи пазл из архива', reward: 30, cond: (s) => s.archiveBuys >= 1 },
   ];
 
   const ZERO_STATS = () => ({
@@ -64,6 +69,7 @@
     coinsEarned: 0,
     nightWin: 0, earlyWin: 0, expertFirst: 0, reverseOrder: 0, straightOrder: 0,
     dayStreak: 0, bestDayStreak: 0, lastDay: '',
+    dailyWins: 0, weeklyWins: 0, shares: 0, archiveBuys: 0,
   });
 
   let state = null;
@@ -75,6 +81,7 @@
       avatar: 0, owned: [0],
       ach: {},                // id → unlock timestamp
       archive: [],            // most recent first
+      daily: {},              // official puzzles: key → result (win, rows, ...)
       stats: ZERO_STATS(),
       lastResult: '',
     };
@@ -137,6 +144,7 @@
         const raw = JSON.parse(localStorage.getItem(KEY) || 'null');
         state = raw ? Object.assign(fresh(), raw) : fresh();
         state.stats = Object.assign(ZERO_STATS(), state.stats || {});
+        state.daily = state.daily || {};
       } catch (e) {
         state = fresh();
       }
@@ -158,6 +166,16 @@
     get stats() { return state.stats; },
     get archive() { return state.archive; },
     get achUnlocked() { return state.ach; },
+
+    /* official daily/weekly puzzle results */
+    dailyResult(key) { return state.daily[key] || null; },
+    setDailyResult(key, res) {
+      const prev = state.daily[key];
+      if (prev && prev.win && !res.win) return; // a win is never downgraded
+      state.daily[key] = res;
+      save();
+      emit('daily');
+    },
     get achCount() { return Object.keys(state.ach).length; },
 
     addCoins(n) {
@@ -205,8 +223,9 @@
       emit('stats');
     },
 
-    /** Full end-of-round accounting. Returns the reward summary. */
-    recordGame({ win, seconds, mistakes, order = [], puzzle, solvedCount }) {
+    /** Full end-of-round accounting. Returns the reward summary.
+        mode: 'free' | 'daily' | 'weekly' — the weekly monster pays ×3. */
+    recordGame({ win, seconds, mistakes, order = [], puzzle, solvedCount, mode = 'free' }) {
       const s = state.stats;
       const prev = state.lastResult;
       s.games++;
@@ -231,6 +250,8 @@
         const key = order.join('>');
         if (key === 'expert>hard>medium>easy') s.reverseOrder++;
         if (key === 'easy>medium>hard>expert') s.straightOrder++;
+        if (mode === 'daily') s.dailyWins++;
+        if (mode === 'weekly') s.weeklyWins++;
       } else {
         s.losses++;
         s.winStreak = 0;
@@ -244,11 +265,12 @@
       });
       if (state.archive.length > MAX_ARCHIVE) state.archive.length = MAX_ARCHIVE;
 
-      /* rewards */
+      /* rewards; the "impossible" weekly pays triple when beaten */
       const hearts = VT.MAX_MISTAKES - mistakes;
       const timeBonus = seconds < 60 ? 30 : seconds < 120 ? 20 : seconds < 300 ? 10 : 0;
-      const coins = win ? 50 + hearts * 15 + timeBonus : 5;
-      const xp = win ? 80 + hearts * 12 + (mistakes === 0 ? 40 : 0) : 15;
+      const mult = win && mode === 'weekly' ? 3 : 1;
+      const coins = win ? (50 + hearts * 15 + timeBonus) * mult : 5;
+      const xp = win ? (80 + hearts * 12 + (mistakes === 0 ? 40 : 0)) * mult : 15;
 
       grant(coins);
       const newLevels = this.addXP(xp); // addXP saves + emits

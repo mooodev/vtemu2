@@ -20,16 +20,21 @@ animation — this is a polished game, not a prototype.
   pre-linked), `#solve` / `#fail` (one submit), `#win` / `#lose` (full
   auto-playthrough; `#win` ends at the bouncing ПОБЕДА button).
 - Reset player state in console: `localStorage.clear()` (keys:
-  `vtemu-profile`, `vtemu-settings`).
+  `vtemu-profile`, `vtemu-settings`, `vtemu-puzzles-*` — the last are
+  offline caches of the GitHub puzzle pools).
 
 ## File map — edit here for X
 
 | Task | File |
 |---|---|
-| New puzzle (4 groups × 4 words) | `js/game/data.js` → push into `VT.data.puzzles` |
+| Official daily/weekly puzzle words | edit `*puzzles.json` on GitHub (`VT_ENV.PUZZLES_BASE`) — fetched on boot, cache-busted once per Moscow day; local `easypuzzles.json` etc. are the bundled fallbacks |
+| Rotation start date, puzzles repo URL, archive price, ОБЪЯСНИТЬ base price | `env.js` (`window.VT_ENV`, loaded before everything) |
+| Daily/weekly schedule math (Moscow midnight, weekday→difficulty, file order) | `js/game/daily.js` (`VT.daily`) |
+| ИГРАТЬ mode modal, АРХИВ screen, result modal, ПОДЕЛИТЬСЯ share grid | `js/ui/daily.js` (`VT.dailyUI`) |
+| Demo puzzle for dev routes (4 groups × 4 words) | `js/game/data.js` → `VT.data.puzzles` |
 | Humorous word definition (ОБЪЯСНИТЬ) | `js/game/data.js` → `LORE` map (word → text, no group spoilers) |
 | New achievement | `js/core/profile.js` → `ACH` array (`cond(stats, state)`, optional `prog`, `secret`, `reward`); add a counter to `ZERO_STATS` and call `VT.profile.track('name')` from where it happens |
-| Coin/XP economy numbers | `js/core/profile.js` → `recordGame` (win rewards), `xpNeed`, level-up bonus in `addXP`; ОБЪЯСНИТЬ price = `EXPLAIN_COST` in `js/ui/game.js` |
+| Coin/XP economy numbers | `js/core/profile.js` → `recordGame` (win rewards, weekly ×3), `xpNeed`, level-up bonus in `addXP`; ОБЪЯСНИТЬ starts at `VT_ENV.EXPLAIN_BASE_COST` and doubles per use in a round (`js/ui/game.js`) |
 | More avatars | extend sheet `assets/img/avatars.png`, bump `ROWS`/`COLS` + append `META` in `js/core/avatars.js` — everything else adapts. Index 0 = built-in computer mascot (free default), sheet cell = index − 1 |
 | New pixel-art icon | `js/core/sprites.js` → string grid in `DEFS` (`.` transparent, `x` = recolorable, palette chars in `PAL`); use `VT.sprites.img('name', {scale, color})` |
 | New sound | `js/core/audio.js` → one line in `SFX` (freq-sweep recipes); play with `VT.audio.play('name')` |
@@ -48,7 +53,11 @@ animation — this is a polished game, not a prototype.
 ## API cheat sheet (the 90% you need)
 
 ```js
-VT.screens.go('menu'|'game'|'profile'|'shop')   // CRT-static transition
+VT.screens.go('menu'|'game'|'profile'|'shop'|'archive')   // CRT-static transition
+VT.gameScreen.play(meta)       // launch an official puzzle (meta from VT.daily.today()/thisWeek()/byDay(i))
+VT.daily.today() / .thisWeek() // {kind, key, num, diff, date, puzzle} or null until .load() resolves
+VT.profile.dailyResult(key) / .setDailyResult(key, res)   // official results (win, rows for share, ...)
+VT.dailyUI.openPlayModal() / .share(key)
 VT.toast('ТЕКСТ', 'good'|'err'|'ach'|'', ms)
 VT.modal.open({ title, icon, sub, body, buttons:[{label, icon, primary, onClick}], veilClose })
 VT.audio.play('click'|'coin'|'buy'|'denied'|'ach'|'level'|'win'|'lose'|...)
@@ -81,3 +90,13 @@ achievement unlocks and level-ups announce themselves automatically through
 - Board emits `win` ~0.5s after the 4th solve; `ui/game.js` turns ПРОВЕРИТЬ
   into ПОБЕДА and only opens the win modal on click — keep that order
   (rewards are granted in `showWin`, not on solve).
+- `env.js` must stay the first script tag — it defines `window.VT_ENV`
+  without touching `VT`; everything else reads it at call time.
+- Official puzzles are one-shot: win OR lose marks the day done
+  (`profile.daily[key]`); replays of lost days are sold via the archive
+  price. Result keys are index-based (`daily-N`/`weekly-N`), so changing
+  `VT_ENV.START_DATE` after launch remaps players' saved results.
+- Fetched puzzles get group diffs by position (cat 1→easy … cat 4→expert)
+  — order the categories in the JSON from freebie to mind-bender.
+- The share grid is built from `board.guesses` (diff rows per submit);
+  dejavu submits are not counted.

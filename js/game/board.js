@@ -38,6 +38,7 @@
       this.pickHandler = null; // when set, intercepts tile taps (ОБЪЯСНИТЬ mode)
       this.solvedCount = 0;
       this.mistakes = 0;
+      this.guesses = [];     // per-submit group-diff rows (share grid)
       this.history = new Set();
       this.locked = false;
       this.groupOf = new Map();
@@ -132,6 +133,7 @@
         return;
       }
       this.history.add(key);
+      this.guesses.push(words.map((w) => this.groupOf.get(w).diff));
 
       const counts = new Map();
       words.forEach((w) => {

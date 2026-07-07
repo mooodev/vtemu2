@@ -13,12 +13,28 @@ works on phones (portrait and landscape).
 - Click/tap tiles to link them into a chain (max 4). Click again to unlink.
 - `ПРОВЕРИТЬ` / **Enter** — submit the chain.
 - `МЕШАТЬ` / **S** — shuffle tiles. `СБРОС` / **Esc** — clear selection.
-- `ОБЪЯСНИТЬ` (costs 10 coins) — arm it, tap any word, get a mock-wiki
-  humorous definition (`lore` in `js/game/data.js`).
+- `ОБЪЯСНИТЬ` (10 coins, price doubles with every hint bought in a round)
+  — arm it, tap any word, get a mock-wiki humorous definition
+  (`lore` in `js/game/data.js`).
 - 4 mistakes = defeat. ВЫХОД in the menu actually powers the CRT down —
   tap the dead screen to turn it back on.
 - Solving all 4 groups turns ПРОВЕРИТЬ into a bouncing gold **ПОБЕДА**
   button — review your groups, then press it to collect coins/XP.
+
+## Official puzzles
+
+ИГРАТЬ offers two live modes: **ПАЗЛ ДНЯ** — one official puzzle for
+everyone, rolling over at midnight Moscow time (difficulty follows the
+weekday: пн easy, вт mid, ср hard, чт mid, пт easy, сб mid, вс hard) —
+and the **ПАЗЛ НЕДЕЛИ**, an "unsolvable" expert monster that changes
+every Monday and pays ×3 when beaten. Words are fetched on boot from
+the GitHub repo configured in `env.js` (`easypuzzles.json` etc. — edit
+them online, no redeploy), consumed in file order from
+`VT_ENV.START_DATE`; the last good copy is cached for offline play.
+Every puzzle is one attempt; missed or lost days can be bought back in
+the АРХИВ for coins. Finished puzzles get a ПОДЕЛИТЬСЯ button that
+copies a spoiler-free colored-square grid (Wordle-style) to the
+clipboard.
 
 ## Meta-game
 

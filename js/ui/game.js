@@ -9,7 +9,9 @@
   const VT = window.VT;
   const { el, screenPos } = VT.util;
 
-  const EXPLAIN_COST = 10;
+  /* ОБЪЯСНИТЬ: base price doubles with each hint bought in a round */
+  const EXPLAIN_BASE = (window.VT_ENV && window.VT_ENV.EXPLAIN_BASE_COST) || 10;
+  const EMO = { easy: '🟩', medium: '🟨', hard: '🟦', expert: '🟪' };
 
   let board = null;
   let wires = null;
@@ -19,7 +21,9 @@
   let victory = false;        // board solved, waiting for the ПОБЕДА press
   let victorySparkT = null;
   let explaining = false;
+  let explainUses = 0;        // hints bought this round → price = base × 2^uses
   let solvedOrder = [];       // group diffs in solve order (achievements)
+  let pending = null;         // official puzzle meta from VT.daily (null = demo round)
 
   /* ---------------- talking logo ---------------- */
 
@@ -183,23 +187,45 @@
     return body;
   }
 
+  /** Persist an official (daily/weekly) result — feeds archive + share. */
+  function saveOfficialResult(win) {
+    if (!pending) return;
+    VT.profile.setDailyResult(pending.key, {
+      win, seconds, mistakes: board.mistakes, solved: board.solvedCount,
+      rows: board.guesses.map((g) => g.map((d) => EMO[d]).join('')),
+      num: pending.num, kind: pending.kind, diff: pending.diff, date: pending.date,
+      ts: Date.now(),
+    });
+  }
+
+  /* official puzzles are one-shot: no free replay, share instead */
+  function resultButtons(retryLabel) {
+    return pending ? [
+      { label: 'ПОДЕЛИТЬСЯ', icon: 'star', primary: true, keepOpen: true, onClick: () => VT.dailyUI.share(pending.key) },
+      { label: 'В МЕНЮ', icon: 'back', onClick: () => VT.screens.go('menu') },
+    ] : [
+      { label: retryLabel, icon: 'shuffle', primary: true, onClick: restart },
+      { label: 'В МЕНЮ', icon: 'back', onClick: () => VT.screens.go('menu') },
+    ];
+  }
+
   function showWin() {
     clearInterval(victorySparkT); victorySparkT = null;
     const rewards = VT.profile.recordGame({
       win: true, seconds, mistakes: board.mistakes,
       order: solvedOrder, puzzle: board.puzzle, solvedCount: board.solvedCount,
+      mode: pending ? pending.kind : 'free',
     });
+    saveOfficialResult(true);
     VT.audio.play('win');
     VT.fx.confettiRain(3);
     setTimeout(() => VT.fx.confettiRain(2), 800);
     VT.modal.open({
-      title: 'ПОБЕДА!', icon: 'trophy', sub: 'ВСЕ ГРУППЫ НАЙДЕНЫ',
+      title: 'ПОБЕДА!', icon: 'trophy',
+      sub: pending ? `${pending.puzzle.title} РЕШЁН!` : 'ВСЕ ГРУППЫ НАЙДЕНЫ',
       body: statsBody(rewards),
       veilClose: false,
-      buttons: [
-        { label: 'ЕЩЁ РАЗ', icon: 'shuffle', primary: true, onClick: restart },
-        { label: 'В МЕНЮ', icon: 'back', onClick: () => VT.screens.go('menu') },
-      ],
+      buttons: resultButtons('ЕЩЁ РАЗ'),
     });
     /* coins pour from the reward row into the counter */
     setTimeout(() => {
@@ -218,26 +244,33 @@
     const rewards = VT.profile.recordGame({
       win: false, seconds, mistakes: board.mistakes,
       order: solvedOrder, puzzle: board.puzzle, solvedCount: board.solvedCount,
+      mode: pending ? pending.kind : 'free',
     });
+    saveOfficialResult(false);
     VT.modal.open({
-      title: 'ПОРАЖЕНИЕ', icon: 'heartDead', sub: 'ПОПЫТКИ ЗАКОНЧИЛИСЬ',
+      title: 'ПОРАЖЕНИЕ', icon: 'heartDead',
+      sub: pending && pending.kind === 'weekly' ? 'МОНСТР ПОБЕДИЛ. МЫ ПРЕДУПРЕЖДАЛИ' : 'ПОПЫТКИ ЗАКОНЧИЛИСЬ',
       body: statsBody(rewards),
       veilClose: false,
-      buttons: [
-        { label: 'РЕВАНШ', icon: 'shuffle', primary: true, onClick: restart },
-        { label: 'В МЕНЮ', icon: 'back', onClick: () => VT.screens.go('menu') },
-      ],
+      buttons: resultButtons('РЕВАНШ'),
     });
   }
 
   /* ---------------- paid ОБЪЯСНИТЬ ---------------- */
 
+  const explainCost = () => EXPLAIN_BASE * Math.pow(2, explainUses);
+
+  function updateExplainCost() {
+    const span = document.querySelector('#explain-cost span');
+    if (span) span.textContent = String(explainCost());
+  }
+
   function armExplain() {
     if (!board || finished || board.locked) return;
     if (explaining) return cancelExplain();
-    if (VT.profile.coins < EXPLAIN_COST) {
+    if (VT.profile.coins < explainCost()) {
       VT.audio.play('denied');
-      VT.toast(`НУЖНО ${EXPLAIN_COST} МОНЕТ`, 'err', 1500);
+      VT.toast(`НУЖНО ${explainCost()} МОНЕТ`, 'err', 1500);
       const btn = document.getElementById('btn-explain');
       btn.classList.add('shake-no');
       setTimeout(() => btn.classList.remove('shake-no'), 450);
@@ -260,11 +293,14 @@
 
   function explainTile(tile) {
     cancelExplain();
-    if (!VT.profile.spendCoins(EXPLAIN_COST)) return;
+    const cost = explainCost();
+    if (!VT.profile.spendCoins(cost)) return;
+    explainUses++;           // the next hint costs twice as much
+    updateExplainCost();
     VT.profile.track('explains');
     VT.audio.play('buy');
     const word = tile.dataset.word;
-    VT.hud.spendCoins(EXPLAIN_COST, screenPos(tile));
+    VT.hud.spendCoins(cost, screenPos(tile));
 
     setTimeout(() => {
       const body = el('div', 'lore-body');
@@ -285,13 +321,15 @@
   function restart() {
     finished = false;
     solvedOrder = [];
+    explainUses = 0;
+    updateExplainCost();
     resetControls();
     cancelExplain();
     stopLogoTalk();
     if (gameLogo.text !== TITLE) gameLogo.setText(TITLE);
     scheduleIdle();
     board = new VT.Board({
-      puzzle: VT.data.puzzles[0],
+      puzzle: (pending && pending.puzzle) || VT.data.puzzles[0],
       grid: document.getElementById('grid'),
       wrap: document.getElementById('board-wrap'),
       solvedStack: document.getElementById('solved-stack'),
@@ -307,6 +345,9 @@
     setHint(0);
     board.deal();
     startTimer();
+    if (pending) {
+      VT.toast(`${pending.puzzle.title} — ${VT.data.DIFF[pending.diff].name}`, pending.kind === 'weekly' ? 'err' : 'good', 2000);
+    }
   }
 
   function onBoardEvent(name, a, b) {
@@ -354,7 +395,7 @@
     VT.sprites.mount(document.querySelector('#btn-explain [data-ico]'), 'bulb', { scale: 2 });
     const cost = document.getElementById('explain-cost');
     cost.appendChild(VT.sprites.img('coin', { scale: 1 }));
-    cost.appendChild(el('span', '', String(EXPLAIN_COST)));
+    cost.appendChild(el('span', '', String(EXPLAIN_BASE)));
 
     /* keyboard niceties */
     document.addEventListener('keydown', (e) => {
@@ -375,6 +416,13 @@
   }
 
   VT.gameScreen = {
+    /** Launch an official puzzle (meta from VT.daily: puzzle/kind/key/...). */
+    play(meta) {
+      pending = meta || null;
+      if (VT.screens.current === 'game') restart();
+      else VT.screens.go('game');
+    },
+
     init() {
       gameLogo = VT.logo.mount(document.getElementById('game-logo'), TITLE);
       wires = new VT.WireLayer(

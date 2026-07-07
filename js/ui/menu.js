@@ -201,7 +201,7 @@
       const p = screenPos(btn);
       VT.fx.burst(p.x - p.w / 2 + 20, p.y, { count: 6, speed: 80, size: [2, 4] });
       const act = btn.dataset.action;
-      if (act === 'play') VT.screens.go('game');
+      if (act === 'play') VT.dailyUI.openPlayModal();
       else if (act === 'shop') VT.screens.go('shop');
       else if (act === 'profile') VT.screens.go('profile');
       else if (act === 'settings') settingsModal();

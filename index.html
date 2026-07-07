@@ -87,6 +87,18 @@
     <footer class="status-bar" data-statusbar></footer>
   </section>
 
+  <!-- ============ ARCHIVE (missed daily/weekly puzzles) ============ -->
+  <section class="view" id="view-archive" hidden>
+    <header class="game-header">
+      <button class="icon-btn" id="btn-archive-back" title="В меню"><span data-ico="back"></span></button>
+      <h2 class="meta-title">АРХИВ</h2>
+      <div class="chip coin-chip" data-coinchip></div>
+    </header>
+    <p class="game-hint" id="archive-hint">ПРОПУСТИЛ ДЕНЬ? ДОГОНЯЙ — ЗА МОНЕТЫ</p>
+    <div class="meta-body" id="archive-body"></div>
+    <footer class="status-bar" data-statusbar></footer>
+  </section>
+
   <!-- overlays that live inside the CRT glass -->
   <div id="toast-root"></div>
   <div id="modal-root"></div>
@@ -99,6 +111,7 @@
   <div id="wake-hint"><span>НАЖМИ, ЧТОБЫ ВКЛЮЧИТЬ</span></div>
 </div>
 
+<script src="env.js"></script>
 <script src="js/core/util.js"></script>
 <script src="js/core/sprites.js"></script>
 <script src="js/core/audio.js"></script>
@@ -108,6 +121,7 @@
 <script src="js/core/profile.js"></script>
 <script src="js/ui/hud.js"></script>
 <script src="js/game/data.js"></script>
+<script src="js/game/daily.js"></script>
 <script src="js/game/wires.js"></script>
 <script src="js/game/board.js"></script>
 <script src="js/ui/logo.js"></script>
@@ -115,6 +129,7 @@
 <script src="js/ui/game.js"></script>
 <script src="js/ui/shop.js"></script>
 <script src="js/ui/profileView.js"></script>
+<script src="js/ui/daily.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

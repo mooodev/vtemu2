@@ -161,7 +161,7 @@
       <div class="rs"><b>${g.solved ?? '?'}/4</b><span>ГРУППЫ</span></div>`;
     body.appendChild(stats);
 
-    const puzzle = VT.data.puzzles.find((p) => p.id === g.id);
+    const puzzle = VT.data.puzzles.find((p) => p.id === g.id) || VT.daily.puzzleById(g.id);
     if (puzzle) {
       const list = el('div', 'reveal-list');
       list.style.marginTop = '14px';

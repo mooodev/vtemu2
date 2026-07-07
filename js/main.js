@@ -47,6 +47,9 @@
   function boot() {
     VT.settings.load();
     VT.profile.load();
+    /* pull the official puzzle pools from GitHub in the background;
+       the ИГРАТЬ modal awaits (and retries) this on demand */
+    VT.daily.load().catch(() => { /* offline — handled at play time */ });
     VT.fx.init();
     installCursors();
     VT.hud.build();
@@ -58,6 +61,7 @@
     VT.gameScreen.init();
     VT.shopScreen.init();
     VT.profileScreen.init();
+    VT.dailyUI.init();
 
     /* audio requires a user gesture — unlock on first input */
     const unlock = () => { VT.audio.unlock(); document.removeEventListener('pointerdown', unlock); };
